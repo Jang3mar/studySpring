@@ -34,8 +34,9 @@
                 <table>
                     <tr th:each="item : ${regs}">
                         <form>
-                            <td><input style="width: 300px; font-size: 20px" th:value="${item.empFIO}" readonly></td>
-                            <td><input style="width: 300px ; font-size: 20px" th:value="${item.empPositions}" readonly></td>
+                            <td><a th:text="${item.empFIO}"></a></td>
+                            <td><a th:text="${item.empPositions}"></a></td>
+                            <td><a th:text="${item.dateTimeRegistrarion}"></a></td>
                         </form>
                     </tr>
                 </table>
@@ -45,41 +46,58 @@
             <label>Направления</label>
             <div class="patient-item">
                 <form>
-                    <input type="checkbox" name="therapy" id="therapy" value="Терапия">
+                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="therapy" id="therapy" value="Терапевт">
                     <label>Терапия</label>
                 </form>
                 <form>
-                    <input type="checkbox" name="stomatology" id="stomatology" value="Стоматология">
+                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="stomatology" id="stomatology" value="Стоматолог">
                     <label>Стоматология</label>
                 </form>
                 <form>
-                    <input type="checkbox" name="ginekology" id="ginekology" value="Гинекология">
+                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="ginekology" id="ginekology" value="Гинеколог">
                     <label>Гинекология</label>
                 </form>
                 <form>
-                    <input type="checkbox" name="nevrology" id="nevrology" value="Неврология">
+                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="nevrology" id="nevrology" value="Невролог">
                     <label>Неврология</label>
                 </form>
                 <form>
-                    <input type="checkbox" name="urology" id="urology" value="Урология">
+                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="urology" id="urology" value="Уролог">
                     <label>Урология</label>
                 </form>
                 <form>
-                    <input type="checkbox" name="kardiology" id="kardiology" value="Кардиология">
+                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="kardiology" id="kardiology" value="Кардиолог">
                     <label>Кардиология</label>
                 </form>
                 <form>
-                    <input type="checkbox" name="lor" id="lor" value="Отоларингология">
+                    <input onchange="onChangeCB()" class="check_box_js_check"type="checkbox" name="lor" id="lor" value="Отоларинголог">
                     <label>Отоларингология</label>
                 </form>
                 <form>
-                    <input type="checkbox" name="usi" id="usi" value="УЗИ">
+                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="usi" id="usi" value="УЗИ">
                     <label>УЗИ</label>
+                </form>
+                <form method="get" action="/PatientMenu">
+                    <input id="types_box" name="typesFilter" hidden>
+                    <button type="submit">Найти</button>
                 </form>
             </div>
         </div>
     </div>
 
 </div>
+<script>
+    function onChangeCB(){
+        var result = "";
+        var inputHidden = document.getElementById("types_box");
+        var inputElements = document.getElementsByClassName('check_box_js_check');
+        for(var i=0; inputElements[i]; ++i){
+            if(inputElements[i].checked){
+                result += inputElements[i].value +",";
+            }
+        }
+        inputHidden.value = result;
+    }
+</script>
 </body>
 </html>

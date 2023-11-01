@@ -41,13 +41,28 @@ public class HomeController {
     }
 
     @GetMapping("/PatientMenu")
-    public String getPatientMenu(Model model){
+    public String getPatientMenu(Model model, @RequestParam(value = "typesFilter", required = false) String types){
         try{
             APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
             List<Registration> PE = api.getRegistrarions().execute().body();
             List<EmpPositionInfo> epInfo = new ArrayList<>();
             for (Registration reg: PE) {
-                epInfo.add(new EmpPositionInfo(reg.getID_Emp_Reg()));
+                epInfo.add(new EmpPositionInfo(reg.getID_Emp_Reg(), reg.getDate_Reg()+" "+reg.getTime_Reg()));
+            }
+            Logger.getAnonymousLogger().info(types);
+            if(types != null && !types.isEmpty()){
+                types = types.substring(0, types.length()-1);
+                String[] typeArr = types.split(",");
+                List<EmpPositionInfo> resList = new ArrayList<>();
+                for (EmpPositionInfo info: epInfo) {
+                    for(int i = 0; i< typeArr.length;i++){
+                        if(info.empPositions.toLowerCase().contains(typeArr[i].toLowerCase())){
+                            resList.add(info);
+                            break;
+                        }
+                    }
+                }
+                epInfo = resList;
             }
             model.addAttribute("regs", epInfo);
         }
