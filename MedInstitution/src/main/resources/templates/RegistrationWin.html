@@ -20,10 +20,11 @@
         <input type="text" name="middleName" placeholder="Отчество">
     </div>
     <div class="reg-input1">
-        <input type="text" name="birthdayPatient" placeholder="Дата рождения" required>
+        <input type="datetime-local" name="birthdayPatient" placeholder="Дата рождения" required>
         <input type="text" name="loginPatient" placeholder="Логин" required>
         <input type="password" name="passwordPatient" placeholder="Пароль" required>
     </div>
+    <a style="color: red;" th:text="${error}"></a>
 </div>
 <div class="reg-button">
         <button>Регистрация</button>

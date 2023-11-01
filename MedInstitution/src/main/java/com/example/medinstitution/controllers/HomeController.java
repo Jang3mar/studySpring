@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kotlin.text.Regex;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,10 +22,9 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Controller
@@ -215,14 +215,45 @@ public class HomeController {
                                @RequestParam(name = "middleName") String middleName,
                                @RequestParam(name = "loginPatient") String loginPatient,
                                @RequestParam(name = "passwordPatient") String passwordPatient,
-                               @RequestParam(name = "birthdayPatient") String birthdayPatient){
+                               @RequestParam(name = "birthdayPatient") LocalDateTime birthdayPatient){
         try{
-            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
-            Call<Patient> newPatient = api.registerPatient(new Patient(0l, secondName, firstName, middleName, loginPatient, passwordPatient, birthdayPatient));
-            newPatient.execute();
-            Call<List<Patient>> listPatient = api.getListPatient();
-            Response<List<Patient>> res = listPatient.execute();
-            model.addAttribute("patientList", res.body());
+            String errorMessage = "";
+            if (secondName.length() >= 50 || secondName.length() < 2){
+                errorMessage += " Неверная длина фамилии";
+            }
+            if (firstName.length() >= 50 || firstName.length() < 2){
+                errorMessage += " Неверная длина имени";
+            }
+            if (middleName.length() >= 50 || middleName.length() < 2){
+                errorMessage += " Неверная длина отчества";
+            }
+            if (birthdayPatient.toEpochSecond(ZoneOffset.UTC) >= LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)){
+                errorMessage += " Неверная дата рождения";
+            }
+            if(loginPatient.length() > 20 || loginPatient.length() < 5){
+                errorMessage += " Неверная длина логина";
+            }
+            if(passwordPatient.length() > 30 || passwordPatient.length() < 5){
+                errorMessage += " Неверная длина пароля";
+            }
+            if(!loginPatient.matches("^.*[a-z].*$") || !loginPatient.matches("^.*[A-Z].*$") || !loginPatient.matches("^.*[0-9].*$") || !loginPatient.matches("^.*[!#$%^&*_].*$")){
+                errorMessage += " Логин должен содержать минимум 1 прописную букву, 1 заглавную букву, 1 цифру и 1 спецсимвол";
+            }
+            if(!passwordPatient.matches("^.*[a-z].*$") || !passwordPatient.matches("^.*[A-Z].*$") || !passwordPatient.matches("^.*[0-9].*$") || !passwordPatient.matches("^.*[!#$%^&*_].*$")){
+                errorMessage += " Пароль должен содержать минимум 1 прописную букву, 1 заглавную букву, 1 цифру и 1 спецсимвол";
+            }
+            if (errorMessage != "") {
+                model.addAttribute("error", errorMessage);
+            }
+            else{
+                String regDate = birthdayPatient.getYear() + "-" + birthdayPatient.getMonthValue() + "-" + birthdayPatient.getDayOfMonth();
+                APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+                Call<Patient> newPatient = api.registerPatient(new Patient(0l, secondName, firstName, middleName, loginPatient, passwordPatient, regDate));
+                newPatient.execute();
+                Call<List<Patient>> listPatient = api.getListPatient();
+                Response<List<Patient>> res = listPatient.execute();
+                model.addAttribute("patientList", res.body());
+            }
         }
         catch (Exception e ) {Logger.getAnonymousLogger().info(e.getMessage());}
         return "RegistrationWin";
