@@ -22,8 +22,10 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -73,8 +75,32 @@ public class HomeController {
     }
 
     @GetMapping("/PrivateRoom")
-    public String getPrivateRoom(){
+    public String getPrivateRoom(Model model, @CookieValue("userId") String id ) throws IOException {
+        APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+        Patient curPatient = api.getPatient(Long.parseLong(id)).execute().body();
+        Document doc = api.getDocument(Long.parseLong(id)).execute().body();
+        LocalDateTime ldt = LocalDateTime.now();
+        if(doc != null){
+            model.addAttribute("docs", doc);
+        }
+        model.addAttribute("patient", curPatient);
         return "PrivateRoom";
+    }
+    @PostMapping("/PrivateRoom/AddDocument")
+    public String getPrivateRoom( @CookieValue("userId") String id,
+                                  @RequestParam("SeriesPassport") String seriesPassport,
+                                  @RequestParam("NumPassport") String numPassport,
+                                  @RequestParam("DateIssue") LocalDateTime dateIssue,
+                                  @RequestParam("IssuedBy") String issuedBy,
+                                  @RequestParam("DepCode") String depCode,
+                                  @RequestParam("NumCMI") String numCMI
+                                  ) throws IOException {
+        APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+        Patient curPatient = api.getPatient(Long.parseLong(id)).execute().body();
+        String date = dateIssue.getDayOfMonth()+"."+dateIssue.getMonthValue()+"."+dateIssue.getYear();
+        Document document = new Document(0L,seriesPassport,numPassport,date,depCode,issuedBy,numCMI, curPatient);
+        api.addDocument(document).execute();
+        return "redirect:/PrivateRoom";
     }
 
     @GetMapping("/EmployeeMenu")
@@ -246,7 +272,7 @@ public class HomeController {
                 model.addAttribute("error", errorMessage);
             }
             else{
-                String regDate = birthdayPatient.getYear() + "-" + birthdayPatient.getMonthValue() + "-" + birthdayPatient.getDayOfMonth();
+                String regDate = birthdayPatient.getDayOfMonth()+"."+ birthdayPatient.getMonthValue() + "." + birthdayPatient.getYear() ;
                 APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
                 Call<Patient> newPatient = api.registerPatient(new Patient(0l, secondName, firstName, middleName, loginPatient, passwordPatient, regDate));
                 newPatient.execute();

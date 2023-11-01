@@ -4,6 +4,7 @@ import com.example.medinstitution.models.*;
 import jakarta.annotation.Resource;
 import org.jetbrains.annotations.PropertyKey;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -67,4 +68,9 @@ public interface APIInterface {
     public Call<List<Registration>> getRegistrarions();
     @GET("/getRegistration")
     public Call<List<Registration>> getAllRegistrarions();
+    @GET("/getDocument/{id}")
+    public Call<Document> getDocument(@Path("id") Long id);
+    @POST("/addDocument")
+    public Call<Document> addDocument(@Body Document document);
+
 }

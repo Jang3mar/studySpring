@@ -30,7 +30,7 @@ public class Document {
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "ID_Patient", nullable = false)
-    private Patient ID_Patient_Doc;
+    private Patient ID_Patient;
 
     public Document(){}
 
@@ -42,7 +42,7 @@ public class Document {
         Dep_Code = dep_Code;
         Issued_By = issued_By;
         Num_CMI = num_CMI;
-        this.ID_Patient_Doc = ID_Patient_Doc;
+        this.ID_Patient = ID_Patient_Doc;
     }
 
     public Long getID_Document() {
@@ -101,11 +101,11 @@ public class Document {
         Num_CMI = num_CMI;
     }
 
-    public Patient getID_Patient_Doc() {
-        return ID_Patient_Doc;
+    public Patient getID_Patient() {
+        return ID_Patient;
     }
 
-    public void setID_Patient_Doc(Patient ID_Patient_Doc) {
-        this.ID_Patient_Doc = ID_Patient_Doc;
+    public void setID_Patient(Patient ID_Patient_Doc) {
+        this.ID_Patient = ID_Patient_Doc;
     }
 }

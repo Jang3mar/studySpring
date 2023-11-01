@@ -2,6 +2,7 @@ package com.example.medapi.controllers;
 
 import com.example.medapi.DAO.AllDAO;
 import com.example.medapi.Models.*;
+import com.example.medapi.Models.plugs.Document_Info;
 import com.example.medapi.Models.plugs.Position_Employee_Info;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -89,7 +90,37 @@ public class HomeController {
         catch (Exception e) {}
         return positionEmployeeList;
     }
-
+    @GetMapping(value = "/getDocument/{id}")
+    @ResponseBody
+    public Document getDocument(@PathVariable("id") Long id)  {
+        List<Document> documentList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Document", Document.class);
+        try {
+            if(res != null)
+                while (res.next()) {
+                    Document doc = new Document(res.getLong(1),
+                            res.getString(2),
+                            res.getString(3),
+                            res.getString(4),
+                            res.getString(5),
+                            res.getString(6),
+                            res.getString(7),
+                            returnPatient(res.getLong(8)));
+                    documentList.add(doc);
+                }
+        }
+        catch (Exception e) {}
+        return documentList.stream().filter(dc -> dc.getID_Patient().getID_Patient() == id).findAny().orElse(new Document());
+    }
+    @PostMapping("/addDocument")
+    public Document addDocument(@RequestBody Document document){
+        Logger.getAnonymousLogger().info(document.getDate_Issue());
+        Document doc = getDocument(document.getID_Patient().getID_Patient());
+        if(doc.getID_Document() == null)
+            allDAO.addToTable("Document", new Document_Info(document));
+        else allDAO.updateToTable("Document",new Document_Info(document), doc.getID_Document());
+        return new Document();
+    }
     @GetMapping("/getPosition/{id}")
     @ResponseBody
     public Position returnPosition(@PathVariable("id") Long id){
