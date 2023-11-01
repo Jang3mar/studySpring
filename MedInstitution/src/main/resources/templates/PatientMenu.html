@@ -10,7 +10,7 @@
 </head>
 <body class="patient-body">
 <header class="patient-header">
-    <form>
+    <form method="get" action="/AuthorisationWin">
         <button class="left-button">Выйти</button>
     </form>
     <div class="patient-button-styles">
@@ -78,8 +78,10 @@
                     <label>УЗИ</label>
                 </form>
                 <form method="get" action="/PatientMenu">
+                    <div class="button-styles">
                     <input id="types_box" name="typesFilter" hidden>
                     <button type="submit">Найти</button>
+                    </div>
                 </form>
             </div>
         </div>
