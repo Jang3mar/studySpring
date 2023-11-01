@@ -62,4 +62,7 @@ public interface APIInterface {
 
     @DELETE("/deletePatient/{id}")
     public Call<Patient> deletePatient(@Path("id") Long id);
+
+    @GET("/getFreeRegistration")
+    public Call<List<Registration>> getRegistrarions();
 }

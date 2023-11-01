@@ -1,10 +1,7 @@
 package com.example.medapi.controllers;
 
 import com.example.medapi.DAO.AllDAO;
-import com.example.medapi.Models.Employee;
-import com.example.medapi.Models.Patient;
-import com.example.medapi.Models.Position;
-import com.example.medapi.Models.Position_Employee;
+import com.example.medapi.Models.*;
 import com.example.medapi.Models.plugs.Position_Employee_Info;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -113,6 +110,25 @@ public class HomeController {
         List<Patient> patientList = returnPatient();
         return patientList.stream().filter(patient -> patient.getID_Patient() == id).findAny().orElse(null);
     }
+    @GetMapping(value = "/getFreeRegistration")
+    @ResponseBody
+    public List<Registration> getFreeRegistration(){
+        List<Registration> registrationList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Registration", Registration.class);
+        try {
+            Registration registration = new Registration();
+            if(res != null)
+                while (res.next()) {
+                    Patient pt = returnPatient(res.getLong(5));
+                    registration = new Registration(res.getLong(1), res.getString(2),res.getString(3), returnEmployee(res.getLong(4)),pt);
+                    if(pt == null) registrationList.add(registration);
+                }
+        }
+        catch (SQLException e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return registrationList;
+    }
 
     @GetMapping("/getLogIn")
     public Map<String, Object> returnLogIn(@RequestParam("login") String login, @RequestParam("password") String password){
@@ -129,9 +145,9 @@ public class HomeController {
         Logger.getAnonymousLogger().info(employeeList.get(0).getSecond_Employee());
         Employee emp = employeeList.stream().filter(employee -> employee.getLogin_Employee().equals(login) && employee.getPassword_Employee().equals(password)).findAny().orElse(null);
         if(emp != null){
-            List<Position_Employee> posEmp = returnPosEmp().stream().filter(emp1 -> emp1.getID_Emp_Pos().getID_Employee() == emp.getID_Employee()).toList();
+            List<Position_Employee> posEmp = returnPosEmp().stream().filter(emp1 -> emp1.getID_Employee().getID_Employee() == emp.getID_Employee()).toList();
             for (Position_Employee item: posEmp) {
-                if(item.getID_Pos_Emp().getPosition_Name().equals("Админ")){
+                if(item.getID_Position().getPosition_Name().equals("Админ")){
                     map.put("type", "A");
                     map.put("id", emp.getID_Employee());
                     return map;
@@ -164,9 +180,9 @@ public class HomeController {
     @PostMapping(value = "/addPositionEmp")
     public Position_Employee addPosEmp(@RequestBody Position_Employee posEmp){
         try{
-            Logger.getLogger("Logas").info(posEmp.getID_Pos_Emp().getPosition_Name());
+            Logger.getLogger("Logas").info(posEmp.getID_Position().getPosition_Name());
 
-            allDAO.addToTable("Position_Employee", new Position_Employee_Info(0l, posEmp.getID_Emp_Pos().getID_Employee(),posEmp.getID_Pos_Emp().getID_Position()));
+            allDAO.addToTable("Position_Employee", new Position_Employee_Info(0l, posEmp.getID_Employee().getID_Employee(),posEmp.getID_Position().getID_Position()));
             return new Position_Employee();
         }
         catch (Exception e){return null;}

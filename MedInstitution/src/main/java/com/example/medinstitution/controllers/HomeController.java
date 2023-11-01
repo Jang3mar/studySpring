@@ -1,6 +1,7 @@
 package com.example.medinstitution.controllers;
 
 import com.example.medinstitution.models.*;
+import com.example.medinstitution.models.plugs.EmpPositionInfo;
 import com.example.medinstitution.utilities.APIInterface;
 import com.example.medinstitution.utilities.RequestBuilder;
 import com.google.gson.Gson;
@@ -18,6 +19,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
@@ -42,17 +44,12 @@ public class HomeController {
     public String getPatientMenu(Model model){
         try{
             APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
-            Call<List<Position>> listPosition = api.getListPosition();
-            Call<List<Employee>> listEmployee = api.getListEmployee();
-            Call<List<Position_Employee>> listPosEmp = api.getListPosEmp();
-            Response<List<Position>> resPos = listPosition.execute();
-            Response<List<Employee>> resEmp = listEmployee.execute();
-            Response<List<Position_Employee>> resPosEmp = listPosEmp.execute();
-            model.addAttribute("positionList", resPos.body());
-            model.addAttribute("employeeList", resEmp.body());
-            model.addAttribute("posEmpList", resPosEmp.body());
-            //Logger.getAnonymousLogger().info(resPosEmp.body().get(0).getID_Emp_Pos().getID_Employee()+"");
-            Logger.getAnonymousLogger().info(resPosEmp.body().get(0).getID_Pos_Emp().getPosition_Name());
+            List<Registration> PE = api.getRegistrarions().execute().body();
+            List<EmpPositionInfo> epInfo = new ArrayList<>();
+            for (Registration reg: PE) {
+                epInfo.add(new EmpPositionInfo(reg.getID_Emp_Reg()));
+            }
+            model.addAttribute("regs", epInfo);
         }
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());};
         return "PatientMenu";

@@ -32,10 +32,10 @@
             <button>Поиск</button>
             <div class="patient-table-main">
                 <table>
-                    <tr th:each="item : ${posEmpList}">
+                    <tr th:each="item : ${regs}">
                         <form>
-                            <td><input th:value="${item.getID_Emp_Pos().getSecond_Employee()}" readonly></td>
-                            <td><input th:value="${item.getID_Pos_Emp().getPosition_Name()}" readonly></td>
+                            <td><input style="width: 300px; font-size: 20px" th:value="${item.empFIO}" readonly></td>
+                            <td><input style="width: 300px ; font-size: 20px" th:value="${item.empPositions}" readonly></td>
                         </form>
                     </tr>
                 </table>
