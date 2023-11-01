@@ -7,7 +7,6 @@ import com.example.medinstitution.utilities.RequestBuilder;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class EmpPositionInfo {
     public String empFIO;

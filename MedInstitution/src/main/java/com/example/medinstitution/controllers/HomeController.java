@@ -1,6 +1,7 @@
 package com.example.medinstitution.controllers;
 
 import com.example.medinstitution.models.*;
+import com.example.medinstitution.models.plugs.EmpPositionForDoctorInfo;
 import com.example.medinstitution.models.plugs.EmpPositionInfo;
 import com.example.medinstitution.utilities.APIInterface;
 import com.example.medinstitution.utilities.RequestBuilder;
@@ -19,6 +20,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -30,8 +32,8 @@ import java.util.logging.Logger;
 public class HomeController {
 
     @GetMapping
-    public String getAutho(Model model, HttpServletRequest httpRequest) {
-        Cookie cok = Arrays.stream(httpRequest.getCookies()).filter(cookie -> cookie.getName().equals("userId")).findAny().orElse(null);
+    public String getAutho(Model model) {
+
         return "AuthorisationWin";
     }
 
@@ -76,7 +78,19 @@ public class HomeController {
     }
 
     @GetMapping("/EmployeeMenu")
-    public String getEmployeeMenu(Model model){
+    public String getEmployeeMenu(Model model, @CookieValue("userId") String id) throws IOException {
+        APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+        List<Registration> registrations = api.getAllRegistrarions().execute().body();
+        registrations = registrations.stream().filter(reg -> reg.getID_Emp_Reg().getID_Employee() == Long.parseLong(id)).toList();
+        List<EmpPositionForDoctorInfo> allInfo = new ArrayList<>();
+        for (Registration registration: registrations) {
+            EmpPositionForDoctorInfo info = new EmpPositionForDoctorInfo(registration.getID_Pat_Reg(),registration.getDate_Reg(),registration.getTime_Reg());
+            allInfo.add(info);
+        }
+        if(allInfo.isEmpty()){
+            allInfo.add(new EmpPositionForDoctorInfo(null, "Нет записей.",""));
+        }
+        model.addAttribute("registrations", allInfo);
         return "EmployeeMenu";
     }
 

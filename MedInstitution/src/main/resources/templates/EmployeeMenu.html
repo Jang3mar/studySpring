@@ -31,11 +31,11 @@
 </form>
 <div class="employee-main-info">
      <table class="employee-reg-table">
-         <tr>
+         <tr th:each="item : ${registrations}">
              <form>
-                 <td><a >Дата</a></td>
-                 <td><a >Время</a></td>
-                 <td><a >Пациент</a></td>
+                 <td><a th:text="${item.date}">Дата</a></td>
+                 <td><a th:text="${item.time}">Время</a></td>
+                 <td><a th:text="${item.patientFIO}">Пациент</a></td>
                  <td><button>Начать прием</button></td>
              </form>
          </tr>

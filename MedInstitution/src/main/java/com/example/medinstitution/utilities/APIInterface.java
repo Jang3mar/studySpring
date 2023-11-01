@@ -65,4 +65,6 @@ public interface APIInterface {
 
     @GET("/getFreeRegistration")
     public Call<List<Registration>> getRegistrarions();
+    @GET("/getRegistration")
+    public Call<List<Registration>> getAllRegistrarions();
 }

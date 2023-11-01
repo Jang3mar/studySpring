@@ -129,6 +129,25 @@ public class HomeController {
         }
         return registrationList;
     }
+    @GetMapping(value = "/getRegistration")
+    @ResponseBody
+    public List<Registration> getRegistration(){
+        List<Registration> registrationList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Registration", Registration.class);
+        try {
+            Registration registration = new Registration();
+            if(res != null)
+                while (res.next()) {
+                    Patient pt = returnPatient(res.getLong(5));
+                    registration = new Registration(res.getLong(1), res.getString(2),res.getString(3), returnEmployee(res.getLong(4)),pt);
+                    registrationList.add(registration);
+                }
+        }
+        catch (SQLException e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return registrationList;
+    }
 
     @GetMapping("/getLogIn")
     public Map<String, Object> returnLogIn(@RequestParam("login") String login, @RequestParam("password") String password){
