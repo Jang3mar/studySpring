@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Отделения</title>
+    <link rel="stylesheet" href="../static/styles.css" th:href="@{/styles.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body class="general-menu">
+<div class="button-styles">
+    <form method="get" action="/AuthorisationWin/AdminPanel"><button>Назад</button></form>
+</div>
+<div class="input-form">
+    <form method="post" action="">
+        <label>Фамилия</label>
+        <input type="text" name="secEmpName" required>
+        <label>Имя</label>
+        <input type="text" name="firEmpName" required>
+        <label>Отчество</label>
+        <input type="text" name="midEmpName">
+        <label>Дата рождения</label>
+        <input type="text" name="birthEmpName" required>
+        <label>Логин</label>
+        <input type="text" name="logEmpName" required>
+        <label>Пароль</label>
+        <input type="text" name="passEmpName" required>
+        <div class="button-styles">
+            <button class="button-styles">Добавить</button>
+        </div>
+    </form>
+</div>
+<div class="buttons-near">
+    <form class="button-styles">
+        <button>Удалить</button>
+    </form>
+    <form class="button-styles">
+        <button>Изменить</button>
+    </form>
+</div>
+<div class="info-table">
+    <table class="table-form">
+        <a>department</a>
+    </table>
+</div>
+</body>
+</html>

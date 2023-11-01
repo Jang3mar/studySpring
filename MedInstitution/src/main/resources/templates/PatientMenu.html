@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Главное меню</title>
+    <link rel="stylesheet" href="../static/styles.css" th:href="@{/styles.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body class="patient-body">
+<header class="patient-header">
+    <form>
+        <button class="left-button">Выйти</button>
+    </form>
+    <div class="patient-button-styles">
+    <form>
+        <button>Приемы</button>
+    </form>
+    <form>
+        <button>Запись</button>
+    </form>
+    </div>
+    <form method="get" action="/PrivateRoom">
+        <button class="right-button">Личный кабинет</button>
+    </form>
+</header>
+<div class="patient-main-panel">
+    <div class="patient-search-menu">
+        <div class="patient-search-table">
+            <input>
+            <button>Поиск</button>
+            <div class="patient-table-main">
+                <table>
+                    <tr th:each="item : ${posEmpList}">
+                        <form>
+                            <td><input th:value="${item.getID_Emp_Pos().getSecond_Employee()}" readonly></td>
+                            <td><input th:value="${item.getID_Pos_Emp().getPosition_Name()}" readonly></td>
+                        </form>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="patient-search-measures">
+            <label>Направления</label>
+            <div class="patient-item">
+                <form>
+                    <input type="checkbox" name="therapy" id="therapy" value="Терапия">
+                    <label>Терапия</label>
+                </form>
+                <form>
+                    <input type="checkbox" name="stomatology" id="stomatology" value="Стоматология">
+                    <label>Стоматология</label>
+                </form>
+                <form>
+                    <input type="checkbox" name="ginekology" id="ginekology" value="Гинекология">
+                    <label>Гинекология</label>
+                </form>
+                <form>
+                    <input type="checkbox" name="nevrology" id="nevrology" value="Неврология">
+                    <label>Неврология</label>
+                </form>
+                <form>
+                    <input type="checkbox" name="urology" id="urology" value="Урология">
+                    <label>Урология</label>
+                </form>
+                <form>
+                    <input type="checkbox" name="kardiology" id="kardiology" value="Кардиология">
+                    <label>Кардиология</label>
+                </form>
+                <form>
+                    <input type="checkbox" name="lor" id="lor" value="Отоларингология">
+                    <label>Отоларингология</label>
+                </form>
+                <form>
+                    <input type="checkbox" name="usi" id="usi" value="УЗИ">
+                    <label>УЗИ</label>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

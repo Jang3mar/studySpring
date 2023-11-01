@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="../static/styles.css" th:href="@{/styles.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body class="private-body">
+<header class="header-private">
+    <form>
+        <div class="button-styles">
+            <button>Назад</button>
+        </div>
+    </form>
+    <form>
+        <div class="button-styles">
+            <button>Приемы</button>
+        </div>
+    </form>
+</header>
+<div class="patient-label">
+    <label>Данные пациента</label>
+</div>
+<form>
+    <div class="button-styles">
+        <button style="margin: 20px">Загрузить результаты обследований</button>
+    </div>
+</form>
+<div class="patient-info-table">
+    <form method="post" action="">
+    <div class="patient-personal-info">
+        <div>
+            <label>Фамилия</label>
+            <input th:value="">
+        </div>
+        <div>
+            <label>Имя</label>
+            <input th:value="">
+        </div>
+        <div>
+            <label>Отчество</label>
+            <input th:value="">
+        </div>
+        <div>
+            <label>Дата рождения</label>
+            <input th:value="">
+        </div>
+        <div>
+            <label>Логин</label>
+            <input th:value="">
+        </div>
+        <div>
+            <label>Пароль</label>
+            <input th:value="">
+        </div>
+    </div>
+    </form>
+    <form>
+    <div class="patient-document-info">
+        <div>
+            <label>Серия паспорта</label>
+            <input type="text" required>
+        </div>
+        <div>
+            <label>Номер паспорта</label>
+            <input type="text" required>
+        </div>
+        <div>
+            <label>Дата выдачи</label>
+            <input type="text" required>
+        </div>
+        <div>
+            <label>Кем выдан</label>
+            <input type="text" required>
+        </div>
+        <div>
+            <label>Код подразделения</label>
+            <input type="text" required>
+        </div>
+        <div>
+            <label>Номер полиса</label>
+            <input type="text" required>
+        </div>
+        <div class="button-styles">
+            <button>Изменить</button>
+        </div>
+    </div>
+    </form>
+</div>
+</body>
+</html>

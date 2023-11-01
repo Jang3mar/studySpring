@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="../static/styles.css" th:href="@{/styles.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body class="reg-body">
+<div class="reg-label">
+    <label>Пройдите процесс регистрации, чтобы пользоваться медицинской системой</label>
+</div>
+<form method="post" action="/RegistrationWin">
+<div class="reg-input">
+    <div class="reg-input1">
+        <input type="text" name="secondName" placeholder="Фамилия" required>
+        <input type="text" name="firstName" placeholder="Имя" required>
+        <input type="text" name="middleName" placeholder="Отчество">
+    </div>
+    <div class="reg-input1">
+        <input type="text" name="birthdayPatient" placeholder="Дата рождения" required>
+        <input type="text" name="loginPatient" placeholder="Логин" required>
+        <input type="password" name="passwordPatient" placeholder="Пароль" required>
+    </div>
+</div>
+<div class="reg-button">
+        <button>Регистрация</button>
+</div>
+</form>
+<form method="get" action="/">
+    <div>
+        <button>Назад к авторизации</button>
+    </div>
+</form>
+</body>
+</html>

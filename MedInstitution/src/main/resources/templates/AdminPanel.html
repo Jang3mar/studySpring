@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель администратора</title>
+    <link rel="stylesheet" href="../static/styles.css" th:href="@{/styles.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body class="admin-body">
+    <header class="admin-head">
+        <div class="admin-button">
+            <form method="get" action="/">
+                <button>Выйти</button>
+            </form>
+        </div>
+    </header>
+    <div class="admin-buttons">
+        <table class="admin-table">
+            <tbody>
+                <tr>
+                    <td><form method="get" action="/AdminPanel/modelsWin/PositionWin"><button>Должности</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/DepartamentWin"><button>Отделения</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/DiagnosisWin"><button>Диагнозы</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/EducationWin"><button>Образования</button></form></td>
+                </tr>
+                <tr>
+                    <td><form method="get" action="/AdminPanel/modelsWin/EmployeeWin"><button>Сотрудники</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/PatientWin"><button>Пациенты</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/DocumentWin"><button>Документы</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/PatientCategoryWin"><button>Категории пациентов</button></form></td>
+                </tr>
+                <tr>
+                    <td><form method="get" action="/AdminPanel/modelsWin/RegWin"><button>Записи</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/ReceptionWin"><button>Приемы</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/MedReferenceWin"><button>Справки</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/MedicalCard"><button>Медицинские карты</button></form></td>
+                </tr>
+                <tr>
+                    <td><form method="get" action="/AdminPanel/modelsWin/PatientCardWin"><button>Справки из мед карты</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/EmployeeDepWin"><button>Отделения сотрудников</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/PositionEmpWin"><button>Должности сотрудников</button></form></td>
+                    <td><form method="get" action="/AdminPanel/modelsWin/EducationEmployeeWin"><button>Образование сотрудников</button></form></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
