@@ -35,7 +35,6 @@ public class HomeController {
 
     @GetMapping
     public String getAutho(Model model) {
-
         return "AuthorisationWin";
     }
 
