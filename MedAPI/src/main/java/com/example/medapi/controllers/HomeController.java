@@ -20,6 +20,8 @@ public class HomeController {
 
     AllDAO allDAO = new AllDAO();
 
+
+    //-------------должность-----------------------
     //"/getPosition"
     @GetMapping(value = "/getPosition")
     @ResponseBody
@@ -39,6 +41,159 @@ public class HomeController {
         return positionList;
     }
 
+    @GetMapping("/getPosition/{id}")
+    @ResponseBody
+    public Position returnPosition(@PathVariable("id") Long id){
+        List<Position> positionList = returnPosition();
+        return positionList.stream().filter(position -> position.getID_Position() == id).findAny().orElse(null);
+    }
+
+    @DeleteMapping("/deletePosition/{id}")
+    public Position deletePosition(@PathVariable("id") Long id){
+        try{
+            Position position = new Position();
+            position.setID_Position(id);
+            allDAO.deleteToTable("Position", position);
+            return new Position();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping(value = "/addPosition")
+    public Position addPosition(@RequestBody Position position){
+        try{
+            allDAO.addToTable("Position", position);
+            return new Position();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updatePosition/{id}")
+    public Position updatePosition(@PathVariable("id") Long id, @RequestBody Position position){
+        try{
+            allDAO.updateToTable("Position", position, position.getID_Position());
+            return new Position();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //--------------------------------------------
+
+    //-----------------отделение-------------------------
+
+    @GetMapping(value = "/getDepartmentMed")
+    @ResponseBody
+    public List<DepartmentMed> returnDepartment(){
+        List<DepartmentMed> departmentList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("DepartmentMed", DepartmentMed.class);
+        try {
+            DepartmentMed departmentMed = new DepartmentMed();
+            while (res.next()) {
+                departmentMed = new DepartmentMed(res.getLong(1), res.getString(2));
+                departmentList.add(departmentMed);
+            }
+        }
+        catch (SQLException e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return departmentList;
+    }
+
+    @GetMapping("/getDepartmentMed/{id}")
+    @ResponseBody
+    public DepartmentMed returnDepartment(@PathVariable("id") Long id){
+        List<DepartmentMed> departmentList = returnDepartment();
+        return departmentList.stream().filter(departmentMed -> departmentMed.getID_Dep_Med() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addDepartmentMed")
+    public DepartmentMed addDepartment(@RequestBody DepartmentMed departmentMed){
+        try{
+            allDAO.addToTable("DepartmentMed", departmentMed);
+            return new DepartmentMed();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updateDepartmentMed/{id}")
+    public DepartmentMed updateDepartment(@PathVariable("id") Long id, @RequestBody DepartmentMed departmentMed){
+        try{
+            allDAO.updateToTable("DepartmentMed", departmentMed, departmentMed.getID_Dep_Med());
+            return new DepartmentMed();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteDepartmentMed/{id}")
+    public DepartmentMed deleteDepartment(@PathVariable("id") Long id){
+        try{
+            DepartmentMed departmentMed = new DepartmentMed();
+            departmentMed.setID_Dep_Med(id);
+            allDAO.deleteToTable("DepartmentMed", departmentMed);
+            return new DepartmentMed();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //--------------------------------------------
+
+    //---------------диагнозы-----------------------
+
+    @GetMapping(value = "/getDiagnosis")
+    @ResponseBody
+    public List<Diagnosis> returnDiagnosis(){
+        List<Diagnosis> diagnosisList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Diagnosis", Diagnosis.class);
+        try {
+            Diagnosis diagnosis = new Diagnosis();
+            while (res.next()) {
+                diagnosis = new Diagnosis(res.getLong(1), res.getString(2), res.getString(3));
+                diagnosisList.add(diagnosis);
+            }
+        }
+        catch (SQLException e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return diagnosisList;
+    }
+
+    @GetMapping("/getDiagnosis/{id}")
+    @ResponseBody
+    public Diagnosis returnDiagnosis(@PathVariable("id") Long id){
+        List<Diagnosis> diagnosisList = returnDiagnosis();
+        return diagnosisList.stream().filter(diagnosis -> diagnosis.getID_Diagnosis() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addDiagnosis")
+    public Diagnosis addDiagnosis(@RequestBody Diagnosis diagnosis){
+        try{
+            allDAO.addToTable("Diagnosis", diagnosis);
+            return new Diagnosis();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updateDiagnosis/{id}")
+    public Diagnosis updateDiagnosis(@PathVariable("id") Long id, @RequestBody Diagnosis diagnosis){
+        try{
+            allDAO.updateToTable("Diagnosis", diagnosis, diagnosis.getID_Diagnosis());
+            return new Diagnosis();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteDiagnosis/{id}")
+    public Diagnosis deleteDiagnosis(@PathVariable("id") Long id){
+        try{
+            Diagnosis diagnosis = new Diagnosis();
+            diagnosis.setID_Diagnosis(id);
+            allDAO.deleteToTable("Diagnosis", diagnosis);
+            return new Diagnosis();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //--------------------------------------------
     @GetMapping(value = "/getEmployee")
     @ResponseBody
     public List<Employee> returnEmployee(){
@@ -120,12 +275,6 @@ public class HomeController {
             allDAO.addToTable("Document", new Document_Info(document));
         else allDAO.updateToTable("Document",new Document_Info(document), doc.getID_Document());
         return new Document();
-    }
-    @GetMapping("/getPosition/{id}")
-    @ResponseBody
-    public Position returnPosition(@PathVariable("id") Long id){
-        List<Position> positionList = returnPosition();
-        return positionList.stream().filter(position -> position.getID_Position() == id).findAny().orElse(null);
     }
 
     @GetMapping("/getEmployee/{id}")
@@ -209,15 +358,6 @@ public class HomeController {
         return map;
     }
 
-    @PostMapping(value = "/addPosition")
-    public Position addPosition(@RequestBody Position position){
-        try{
-            allDAO.addToTable("Position", position);
-            return new Position();
-        }
-        catch (Exception e){return null;}
-    }
-
     @PostMapping(value = "/registerPatient")
     public Patient registerPatient(@RequestBody Patient patient){
         try{
@@ -238,16 +378,7 @@ public class HomeController {
         catch (Exception e){return null;}
     }
 
-    @DeleteMapping("/deletePosition/{id}")
-    public Position deletePosition(@PathVariable("id") Long id){
-        try{
-            Position position = new Position();
-            position.setID_Position(id);
-            allDAO.deleteToTable("Position", position);
-            return new Position();
-        }
-        catch (Exception e){return null;}
-    }
+
 
     @DeleteMapping("/deletePositionEmp/{id}")
     public Position_Employee deletePosEmp(@PathVariable("id") Long id){
@@ -271,14 +402,7 @@ public class HomeController {
         catch (Exception e){return null;}
     }
 
-    @PostMapping("/updatePosition/{id}")
-    public Position updatePosition(@PathVariable("id") Long id, @RequestBody Position position){
-        try{
-            allDAO.updateToTable("Position", position, position.getID_Position());
-            return new Position();
-        }
-        catch (Exception e){return null;}
-    }
+
 
     @PostMapping("/updatePatient/{id}")
     public Patient updatePatient(@PathVariable("id") Long id, @RequestBody Patient patient){
