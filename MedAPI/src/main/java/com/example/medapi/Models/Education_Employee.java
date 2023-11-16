@@ -18,6 +18,14 @@ public class Education_Employee {
     @JoinColumn(name = "ID_Education", nullable = false)
     private Education ID_Edu_Emp;
 
+    public Education_Employee() {}
+
+    public Education_Employee(Long ID_Education_Employee, Employee ID_Emp_Edu, Education ID_Edu_Emp) {
+        this.ID_Education_Employee = ID_Education_Employee;
+        this.ID_Emp_Edu = ID_Emp_Edu;
+        this.ID_Edu_Emp = ID_Edu_Emp;
+    }
+
     public Long getID_Education_Employee() {
         return ID_Education_Employee;
     }

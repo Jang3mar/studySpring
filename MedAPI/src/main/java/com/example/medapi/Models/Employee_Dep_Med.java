@@ -18,6 +18,14 @@ public class Employee_Dep_Med {
     @JoinColumn(name = "ID_Dep_Med", nullable = false)
     private DepartmentMed ID_Dep_Emp;
 
+    public Employee_Dep_Med() {}
+
+    public Employee_Dep_Med(Long ID_Employee_Dep_Med, Employee ID_Emp_Dep, DepartmentMed ID_Dep_Emp) {
+        this.ID_Employee_Dep_Med = ID_Employee_Dep_Med;
+        this.ID_Emp_Dep = ID_Emp_Dep;
+        this.ID_Dep_Emp = ID_Dep_Emp;
+    }
+
     public Long getID_Employee_Dep_Med() {
         return ID_Employee_Dep_Med;
     }

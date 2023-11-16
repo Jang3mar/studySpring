@@ -1,6 +1,7 @@
 package com.example.medapi.Models.plugs;
 
 import com.example.medapi.Models.Diagnosis;
+import com.example.medapi.Models.Reception;
 import com.example.medapi.Models.Registration;
 import jakarta.persistence.*;
 
@@ -17,6 +18,8 @@ public class Reception_Info {
     private Long ID_Reg_Rec;
 
     private Long ID_Dig_Rec;
+
+    public Reception_Info () {}
 
     public Reception_Info(Long ID_Reception, String date_Reception, String time_Reception, String status_Reception, Long ID_Reg_Rec, Long ID_Dig_Rec) {
         this.ID_Reception = ID_Reception;

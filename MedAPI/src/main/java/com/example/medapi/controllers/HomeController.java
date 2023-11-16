@@ -2,8 +2,7 @@ package com.example.medapi.controllers;
 
 import com.example.medapi.DAO.AllDAO;
 import com.example.medapi.Models.*;
-import com.example.medapi.Models.plugs.Document_Info;
-import com.example.medapi.Models.plugs.Position_Employee_Info;
+import com.example.medapi.Models.plugs.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -194,6 +193,9 @@ public class HomeController {
     }
 
     //--------------------------------------------
+
+    //----------------сотрудники------------------
+
     @GetMapping(value = "/getEmployee")
     @ResponseBody
     public List<Employee> returnEmployee(){
@@ -212,6 +214,46 @@ public class HomeController {
         return employeeList;
     }
 
+    @GetMapping("/getEmployee/{id}")
+    @ResponseBody
+    public Employee returnEmployee(@PathVariable("id") Long id){
+        List<Employee> employeeList = returnEmployee();
+        return employeeList.stream().filter(employee -> employee.getID_Employee() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addEmployee")
+    public Employee addEmployee(@RequestBody Employee employee){
+        try{
+            allDAO.addToTable("Employee", employee);
+            return new Employee();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updateEmployee/{id}")
+    public Employee updateEmployee(@PathVariable("id") Long id, @RequestBody Employee employee){
+        try{
+            allDAO.updateToTable("Employee", employee, employee.getID_Employee());
+            return new Employee();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteEmployee/{id}")
+    public Employee deleteEmployee(@PathVariable("id") Long id){
+        try{
+            Employee employee = new Employee();
+            employee.setID_Employee(id);
+            allDAO.deleteToTable("Employee", employee);
+            return new Employee();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //--------------------------------------------
+
+    //----------------пациенты--------------------
+
     @GetMapping(value = "/getPatient")
     @ResponseBody
     public List<Patient> returnPatient(){
@@ -228,23 +270,102 @@ public class HomeController {
         return patientList;
     }
 
-    @GetMapping(value = "/getPositionEmployee")
+    @GetMapping("/getPatient/{id}")
     @ResponseBody
-    public List<Position_Employee> returnPosEmp() {
-        List<Position_Employee> positionEmployeeList = new ArrayList<>();
-        ResultSet res = allDAO.selectToTable("Position_Employee", Position_Employee.class);
-        try {
-            while (res.next()) {
-                Position_Employee posEmp = new Position_Employee();
-                Position position = returnPosition(res.getLong(3));
-                Employee employee = returnEmployee(res.getLong(2));
-                posEmp = new Position_Employee(res.getLong(1), employee, position);
-                positionEmployeeList.add(posEmp);
+    public Patient returnPatient(@PathVariable("id") Long id){
+        List<Patient> patientList = returnPatient();
+        return patientList.stream().filter(patient -> patient.getID_Patient() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/registerPatient")
+    public Patient registerPatient(@RequestBody Patient patient){
+        try{
+            allDAO.addToTable("Patient", patient);
+            return new Patient();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updatePatient/{id}")
+    public Patient updatePatient(@PathVariable("id") Long id, @RequestBody Patient patient){
+        try{
+            allDAO.updateToTable("Patient", patient, patient.getID_Patient());
+            return new Patient();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deletePatient/{id}")
+    public Patient deletePatient(@PathVariable("id") Long id){
+        try{
+            Patient patient = new Patient();
+            patient.setID_Patient(id);
+            allDAO.deleteToTable("Patient", patient);
+            return new Patient();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //--------------------------------------------
+
+    //----------------образование-----------------
+
+    @GetMapping(value = "/getEducation")
+    @ResponseBody
+    public List<Education> returnEducation(){
+        List<Education> educationList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Education", Education.class);
+        try{
+            Education education = new Education();
+            while (res.next()){
+                education = new Education(res.getLong(1), res.getString(2), res.getString(3), res.getString(4));
+                educationList.add(education);
             }
         }
-        catch (Exception e) {}
-        return positionEmployeeList;
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return educationList;
     }
+
+    @GetMapping("/getEducation/{id}")
+    @ResponseBody
+    public Education returnEducation(@PathVariable("id") Long id){
+        List<Education> educationList = returnEducation();
+        return educationList.stream().filter(education -> education.getID_Education() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addEducation")
+    public Education addEducation(@RequestBody Education education){
+        try{
+            allDAO.addToTable("Education", education);
+            return new Education();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updateEducation/{id}")
+    public Education updateEducation(@PathVariable("id") Long id, @RequestBody Education education){
+        try{
+            allDAO.updateToTable("Education", education, education.getID_Education());
+            return new Education();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteEducation/{id}")
+    public Education deleteEducation(@PathVariable("id") Long id){
+        try{
+            Education education = new Education();
+            education.setID_Education(id);
+            allDAO.deleteToTable("Education", education);
+            return new Education();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //-------------------------------------------
+
+    //---------------документы-------------------
+
     @GetMapping(value = "/getDocument/{id}")
     @ResponseBody
     public Document getDocument(@PathVariable("id") Long id)  {
@@ -267,6 +388,7 @@ public class HomeController {
         catch (Exception e) {}
         return documentList.stream().filter(dc -> dc.getID_Patient().getID_Patient() == id).findAny().orElse(new Document());
     }
+
     @PostMapping("/addDocument")
     public Document addDocument(@RequestBody Document document){
         Logger.getAnonymousLogger().info(document.getDate_Issue());
@@ -277,19 +399,521 @@ public class HomeController {
         return new Document();
     }
 
-    @GetMapping("/getEmployee/{id}")
+    @GetMapping(value = "/getDocument")
     @ResponseBody
-    public Employee returnEmployee(@PathVariable("id") Long id){
-        List<Employee> employeeList = returnEmployee();
-        return employeeList.stream().filter(employee -> employee.getID_Employee() == id).findAny().orElse(null);
+    public List<Document> returnDocument(){
+        List<Document> documentList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Document", Document.class);
+        try{
+            Document document = new Document();
+            while (res.next()){
+                Patient patient = returnPatient(res.getLong(8));
+                document = new Document(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), res.getString(5), res.getString(6), res.getString(7),patient);
+                documentList.add(document);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return documentList;
     }
 
-    @GetMapping("/getPatient/{id}")
+    //------------------------------------------
+
+    //--------образование сотрудника------------
+
+    @GetMapping(value = "/getEducationEmployee")
     @ResponseBody
-    public Patient returnPatient(@PathVariable("id") Long id){
-        List<Patient> patientList = returnPatient();
-        return patientList.stream().filter(patient -> patient.getID_Patient() == id).findAny().orElse(null);
+    public List<Education_Employee> returnEduEmployee(){
+        List<Education_Employee> eduEmployeeLis = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Education_Employee", Education_Employee.class);
+        try{
+            Education_Employee educationEmployee = new Education_Employee();
+            while (res.next()){
+                Education education = returnEducation(res.getLong(3));
+                Employee employee = returnEmployee(res.getLong(2));
+                educationEmployee = new Education_Employee(res.getLong(1), employee, education);
+                eduEmployeeLis.add(educationEmployee);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return eduEmployeeLis;
     }
+
+    @GetMapping(value = "/getEducationEmployee/{id}")
+    @ResponseBody
+    public Education_Employee returnEduEmployeeId(@PathVariable("id") Long id){
+        List<Education_Employee> eduEmployeeLis = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Education_Employee", Education_Employee.class);
+        try{
+            Education_Employee educationEmployee = new Education_Employee();
+            while (res.next()){
+                Education education = returnEducation(res.getLong(3));
+                Employee employee = returnEmployee(res.getLong(2));
+                educationEmployee = new Education_Employee(res.getLong(1), employee, education);
+                eduEmployeeLis.add(educationEmployee);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return eduEmployeeLis.stream().filter(educationEmployee -> educationEmployee.getID_Education_Employee() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addEducationEmployee")
+    public Education_Employee addEduEmp(@RequestBody Education_Employee educationEmployee){
+        try{
+            //Logger.getLogger("Logas").info(posEmp.getID_Position().getPosition_Name());
+
+            allDAO.addToTable("Education_Employee", new Education_Employee_Info(0l, educationEmployee.getID_Emp_Edu().getID_Employee(),educationEmployee.getID_Edu_Emp().getID_Education()));
+            return new Education_Employee();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updateEducationEmployee/{id}")
+    public Education_Employee updateEduEmp(@PathVariable("id") Long id, @RequestBody Education_Employee educationEmployee){
+        try{
+            Education_Employee_Info educationEmployeeInfo = new Education_Employee_Info(educationEmployee.getID_Education_Employee(), educationEmployee.getID_Emp_Edu().getID_Employee(), educationEmployee.getID_Edu_Emp().getID_Education());
+            allDAO.updateToTable("Education_Employee", educationEmployeeInfo, educationEmployee.getID_Education_Employee());
+            return new Education_Employee();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteEduEmp/{id}")
+    public Education_Employee deleteEduEmp(@PathVariable("id") Long id){
+        try{
+            Education_Employee eduEmp = new Education_Employee();
+            eduEmp.setID_Education_Employee(id);
+            allDAO.deleteToTable("Education_Employee", eduEmp);
+            return new Education_Employee();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //------------------------------------------
+
+    //------------отделение сотрудника-----------
+
+    @GetMapping(value = "/getEmployeeDepMed")
+    @ResponseBody
+    public List<Employee_Dep_Med> returnEmployeeDepMed(){
+        List<Employee_Dep_Med> empDepMedList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Employee_Dep_Med", Employee_Dep_Med.class);
+        try{
+            Employee_Dep_Med employeeDepMed = new Employee_Dep_Med();
+            while (res.next()){
+                DepartmentMed departmentMed = returnDepartment(res.getLong(3));
+                Employee employee = returnEmployee(res.getLong(2));
+                employeeDepMed = new Employee_Dep_Med(res.getLong(1), employee, departmentMed);
+                empDepMedList.add(employeeDepMed);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return empDepMedList;
+    }
+
+    @GetMapping(value = "/getEmployeeDepMed/{id}")
+    @ResponseBody
+    public Employee_Dep_Med returnEmployeeDepMedId(@PathVariable("id") Long id){
+        List<Employee_Dep_Med> empDepMedList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Employee_Dep_Med", Employee_Dep_Med.class);
+        try{
+            Employee_Dep_Med empDepMed = new Employee_Dep_Med();
+            while (res.next()){
+                DepartmentMed departmentMed = returnDepartment(res.getLong(3));
+                Employee employee = returnEmployee(res.getLong(2));
+                empDepMed = new Employee_Dep_Med(res.getLong(1), employee, departmentMed);
+                empDepMedList.add(empDepMed);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return empDepMedList.stream().filter(employeeDepMed -> employeeDepMed.getID_Employee_Dep_Med() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addEmployeeDepMed")
+    public Employee_Dep_Med addEmpDepMed(@RequestBody Employee_Dep_Med employeeDepMed){
+        try{
+            //Logger.getLogger("Logas").info(posEmp.getID_Position().getPosition_Name());
+
+            allDAO.addToTable("Employee_Dep_Med", new Employee_Dep_Med_Info(0l, employeeDepMed.getID_Emp_Dep().getID_Employee(),employeeDepMed.getID_Dep_Med().getID_Dep_Med()));
+            return new Employee_Dep_Med();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updateEmployeeDepMed/{id}")
+    public Employee_Dep_Med updateEmpDepMed(@PathVariable("id") Long id, @RequestBody Employee_Dep_Med employeeDepMed){
+        try{
+            Employee_Dep_Med_Info educationEmployeeInfo = new Employee_Dep_Med_Info(employeeDepMed.getID_Employee_Dep_Med(), employeeDepMed.getID_Emp_Dep().getID_Employee(), employeeDepMed.getID_Dep_Med().getID_Dep_Med());
+            allDAO.updateToTable("Employee_Dep_Med", educationEmployeeInfo, employeeDepMed.getID_Employee_Dep_Med());
+            return new Employee_Dep_Med();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteEmployeeDepMed/{id}")
+    public Employee_Dep_Med deleteEmpDepMed(@PathVariable("id") Long id){
+        try{
+            Employee_Dep_Med empDepMed = new Employee_Dep_Med();
+            empDepMed.setID_Employee_Dep_Med(id);
+            allDAO.deleteToTable("Employee_Dep_Med", empDepMed);
+            return new Employee_Dep_Med();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //-------------------------------------------
+
+    //------------должность сотрудника-----------
+
+    @GetMapping(value = "/getPositionEmployee")
+    @ResponseBody
+    public List<Position_Employee> returnPosEmployee(){
+        List<Position_Employee> posEmployeeLis = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Position_Employee", Position_Employee.class);
+        try{
+            Position_Employee positionEmployee = new Position_Employee();
+            while (res.next()){
+                Position position = returnPosition(res.getLong(3));
+                Employee employee = returnEmployee(res.getLong(2));
+                positionEmployee = new Position_Employee(res.getLong(1), employee, position);
+                posEmployeeLis.add(positionEmployee);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return posEmployeeLis;
+    }
+
+    @GetMapping(value = "/getPositionEmployee/{id}")
+    @ResponseBody
+    public Position_Employee returnPosEmployeeId(@PathVariable("id") Long id){
+        List<Position_Employee> posEmployeeList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Position_Employee", Position_Employee.class);
+        try{
+            Position_Employee positionEmployee = new Position_Employee();
+            while (res.next()){
+                Position position = returnPosition(res.getLong(3));
+                Employee employee = returnEmployee(res.getLong(2));
+                positionEmployee = new Position_Employee(res.getLong(1), employee, position);
+                posEmployeeList.add(positionEmployee);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return posEmployeeList.stream().filter(positionEmployee -> positionEmployee.getID_Position_Employee() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addPositionEmployee")
+    public Position_Employee addEduEmp(@RequestBody Position_Employee positionEmployee){
+        try{
+            //Logger.getLogger("Logas").info(posEmp.getID_Position().getPosition_Name());
+
+            allDAO.addToTable("Position_Employee", new Position_Employee_Info(0l, positionEmployee.getID_Employee().getID_Employee(),positionEmployee.getID_Position().getID_Position()));
+            return new Position_Employee();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updatePositionEmployee/{id}")
+    public Position_Employee updatePosEmp(@PathVariable("id") Long id, @RequestBody Position_Employee positionEmployee){
+        try{
+            Position_Employee_Info positionEmployeeInfo = new Position_Employee_Info(positionEmployee.getID_Position_Employee(), positionEmployee.getID_Employee().getID_Employee(), positionEmployee.getID_Position().getID_Position());
+            allDAO.updateToTable("Position_Employee", positionEmployeeInfo, positionEmployeeInfo.getID_Position_Employee());
+            return new Position_Employee();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deletePosEmp/{id}")
+    public Position_Employee deletePosEmp(@PathVariable("id") Long id){
+        try{
+            Position_Employee posEmp = new Position_Employee();
+            posEmp.setID_Position_Employee(id);
+            allDAO.deleteToTable("Position_Employee", posEmp);
+            return new Position_Employee();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //-------------------------------------------
+
+    //-----------------справка-------------------
+
+    @GetMapping(value = "/getMedReference")
+    @ResponseBody
+    public List<Med_Reference> returnMedRef(){
+        List<Med_Reference> medRefList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Med_Reference", Med_Reference.class);
+        try {
+            Med_Reference medRef = new Med_Reference();
+            while (res.next()) {
+                Reception reception = returnReception(res.getLong(4));
+                medRef = new Med_Reference(res.getLong(1), res.getString(2), res.getString(3), reception);
+                medRefList.add(medRef);
+            }
+        }
+        catch (SQLException e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return medRefList;
+    }
+
+    @GetMapping(value = "/getMedReference/{id}")
+    @ResponseBody
+    public Med_Reference returnMedRefId(@PathVariable("id") Long id){
+        List<Med_Reference> medRefList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Med_Reference", Med_Reference.class);
+        try{
+            Med_Reference medReference = new Med_Reference();
+            while (res.next()){
+                Reception reception = returnReception(res.getLong(5));
+                medReference = new Med_Reference(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), reception);
+                medRefList.add(medReference);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return medRefList.stream().filter(medReference -> medReference.getID_Med_Reference() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addMedReference")
+    public Med_Reference addMedRef(@RequestBody Med_Reference medReference){
+        try{
+            allDAO.addToTable("Med_Reference", medReference);
+            return new Med_Reference();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updateMedReference/{id}")
+    public Med_Reference updateMedReference(@PathVariable("id") Long id, @RequestBody Med_Reference medReference){
+        try{
+            allDAO.updateToTable("Med_Reference", medReference, medReference.getID_Med_Reference());
+            return new Med_Reference();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteMedReference/{id}")
+    public Med_Reference deleteMedReference(@PathVariable("id") Long id){
+        try{
+            Med_Reference medReference = new Med_Reference();
+            medReference.setID_Med_Reference(id);
+            allDAO.deleteToTable("Med_Reference", medReference);
+            return new Med_Reference();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //-------------------------------------------
+
+    //------------справка мед карты--------------
+
+    @GetMapping(value = "/getPatientMedCard")
+    @ResponseBody
+    public List<Patient_Med_Card> returnPatMedCard(){
+        List<Patient_Med_Card> patientMedCardList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Patient_Med_Card", Patient_Med_Card.class);
+        try{
+            Patient_Med_Card patientMedCard = new Patient_Med_Card();
+            while (res.next()){
+                Medical_Card medicalCard = returnMedCardId(res.getLong(2));
+                Med_Reference medReference = returnMedRefId(res.getLong(3));
+                patientMedCard = new Patient_Med_Card(res.getLong(1), medicalCard, medReference);
+                patientMedCardList.add(patientMedCard);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return patientMedCardList;
+    }
+
+    @GetMapping(value = "/getPatientMedCard/{id}")
+    @ResponseBody
+    public Patient_Med_Card returnPatientMedCardId(@PathVariable("id") Long id){
+        List<Patient_Med_Card> patientMedCardList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Patient_Med_Card", Patient_Med_Card.class);
+        try{
+            Patient_Med_Card patientMedCard = new Patient_Med_Card();
+            while (res.next()){
+                Medical_Card medicalCard = returnMedCardId(res.getLong(2));
+                Med_Reference medReference = returnMedRefId(res.getLong(3));
+                patientMedCard = new Patient_Med_Card(res.getLong(1), medicalCard, medReference);
+                patientMedCardList.add(patientMedCard);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return patientMedCardList.stream().filter(patientMedCard -> patientMedCard.getID_Pat_Med_Card() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addPatientMedCard")
+    public Patient_Med_Card addPatientMedCard(@RequestBody Patient_Med_Card patientMedCard){
+        try{
+            //Logger.getLogger("Logas").info(posEmp.getID_Position().getPosition_Name());
+
+            allDAO.addToTable("Patient_Med_Card", new Patient_Med_Card_Info(0l, patientMedCard.getID_Med_Card_Ref().getID_Med_Card(),patientMedCard.getID_Ref_Med_Card().getID_Med_Reference()));
+            return new Patient_Med_Card();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updatePatientMedCard/{id}")
+    public Patient_Med_Card updatePatientMedCard(@PathVariable("id") Long id, @RequestBody Patient_Med_Card patientMedCard){
+        try{
+            Patient_Med_Card_Info patientMedCardInfo = new Patient_Med_Card_Info(patientMedCard.getID_Pat_Med_Card(), patientMedCard.getID_Med_Card_Ref().getID_Med_Card(), patientMedCard.getID_Ref_Med_Card().getID_Med_Reference());
+            allDAO.updateToTable("Patient_Med_Card", patientMedCardInfo, patientMedCard.getID_Pat_Med_Card());
+            return new Patient_Med_Card();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteEduEmp/{id}")
+    public Patient_Med_Card deletePatientMedCard(@PathVariable("id") Long id){
+        try{
+            Patient_Med_Card patientMedCard = new Patient_Med_Card();
+            patientMedCard.setID_Pat_Med_Card(id);
+            allDAO.deleteToTable("Patient_Med_Card", patientMedCard);
+            return new Patient_Med_Card();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //-------------------------------------------
+
+    //------------медицинская карта--------------
+
+    @GetMapping(value = "/getMedicalCard")
+    @ResponseBody
+    public List<Medical_Card> returnMedCard(){
+        List<Medical_Card> medicalCardList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Medical_Card", Medical_Card.class);
+        try {
+            Medical_Card medCard = new Medical_Card();
+            while (res.next()) {
+                Patient patient = returnPatient(res.getLong(3));
+                medCard = new Medical_Card(res.getLong(1), res.getString(2), patient);
+                medicalCardList.add(medCard);
+            }
+        }
+        catch (SQLException e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return medicalCardList;
+    }
+
+    @GetMapping(value = "/getMedicalCard/{id}")
+    @ResponseBody
+    public Medical_Card returnMedCardId(@PathVariable("id") Long id){
+        List<Medical_Card> medicalCardList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Medical_Card", Medical_Card.class);
+        try{
+            Medical_Card medicalCard = new Medical_Card();
+            while (res.next()){
+                Patient patient = returnPatient(res.getLong(3));
+                medicalCard = new Medical_Card(res.getLong(1), res.getString(2), patient);
+                medicalCardList.add(medicalCard);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return medicalCardList.stream().filter(medicalCard -> medicalCard.getID_Med_Card() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addMedicalCard")
+    public Medical_Card addMedCard(@RequestBody Medical_Card medicalCard){
+        try{
+            allDAO.addToTable("Medical_Card", medicalCard);
+            return new Medical_Card();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updateMedicalCard/{id}")
+    public Medical_Card updateMedCard(@PathVariable("id") Long id, @RequestBody Medical_Card medicalCard){
+        try{
+            allDAO.updateToTable("Medical_Card", medicalCard, medicalCard.getID_Med_Card());
+            return new Medical_Card();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteMedicalCard/{id}")
+    public Medical_Card deleteMedCard(@PathVariable("id") Long id){
+        try{
+            Medical_Card medicalCard = new Medical_Card();
+            medicalCard.setID_Med_Card(id);
+            allDAO.deleteToTable("Medical_Card", medicalCard);
+            return new Medical_Card();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //-------------------------------------------
+
+    //-----------------прием----------------------
+
+    @GetMapping(value = "/getReception")
+    @ResponseBody
+    public List<Reception> returnReception(){
+        List<Reception> receptionList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Reception", Reception.class);
+        try{
+            Reception reception = new Reception();
+            while (res.next()){
+                Registration registration = returnRegistration(res.getLong(4));
+                Diagnosis diagnosis = returnDiagnosis(res.getLong(5));
+                reception = new Reception(res.getLong(1), res.getString(2), res.getString(3), res.getLong(4), res.getLong(5));
+                receptionList.add(reception);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return receptionList;
+    }
+
+    @GetMapping(value = "/getReception/{id}")
+    @ResponseBody
+    public Reception returnReceptionId(@PathVariable("id") Long id){
+        List<Reception> receptionList = returnReception();
+        return receptionList.stream().filter(reception -> reception.getID_Reception() == id).findAny().orElse(null);
+    }
+
+    @PostMapping(value = "/addReception")
+    public Reception addReception(@RequestBody Reception reception){
+        try{
+            //Logger.getLogger("Logas").info(posEmp.getID_Position().getPosition_Name());
+
+            allDAO.addToTable("Reception", new Reception(0l, reception.getID_Reg_Rec().getID_Registration(),reception.getID_Dig_Rec().getID_Diagnosis()));
+            return new Reception();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @PostMapping("/updateReception/{id}")
+    public Reception updateReception(@PathVariable("id") Long id, @RequestBody Reception reception){
+        try{
+            Reception_Info receptionInfo = new Reception_Info();
+            allDAO.updateToTable("Reception", receptionInfo, receptionInfo.getID_Reception());
+            return new Reception();
+        }
+        catch (Exception e){return null;}
+    }
+
+    @DeleteMapping("/deleteReception/{id}")
+    public Reception deleteReception(@PathVariable("id") Long id){
+        try{
+            Reception reception = new Reception();
+            reception.setID_Reception(id);
+            allDAO.deleteToTable("Reception", reception);
+            return new Reception();
+        }
+        catch (Exception e){return null;}
+    }
+
+    //-------------------------------------------
+
+    //----------------запись----------------------
+
+
+
+    //-------------------------------------------
+
+
+
+
     @GetMapping(value = "/getFreeRegistration")
     @ResponseBody
     public List<Registration> getFreeRegistration(){
@@ -344,7 +968,7 @@ public class HomeController {
         Logger.getAnonymousLogger().info(employeeList.get(0).getSecond_Employee());
         Employee emp = employeeList.stream().filter(employee -> employee.getLogin_Employee().equals(login) && employee.getPassword_Employee().equals(password)).findAny().orElse(null);
         if(emp != null){
-            List<Position_Employee> posEmp = returnPosEmp().stream().filter(emp1 -> emp1.getID_Employee().getID_Employee() == emp.getID_Employee()).toList();
+            List<Position_Employee> posEmp = returnPosEmployee().stream().filter(emp1 -> emp1.getID_Employee().getID_Employee() == emp.getID_Employee()).toList();
             for (Position_Employee item: posEmp) {
                 if(item.getID_Position().getPosition_Name().equals("Админ")){
                     map.put("type", "A");
@@ -358,58 +982,6 @@ public class HomeController {
         return map;
     }
 
-    @PostMapping(value = "/registerPatient")
-    public Patient registerPatient(@RequestBody Patient patient){
-        try{
-            allDAO.addToTable("Patient", patient);
-            return new Patient();
-        }
-        catch (Exception e){return null;}
-    }
-
-    @PostMapping(value = "/addPositionEmp")
-    public Position_Employee addPosEmp(@RequestBody Position_Employee posEmp){
-        try{
-            Logger.getLogger("Logas").info(posEmp.getID_Position().getPosition_Name());
-
-            allDAO.addToTable("Position_Employee", new Position_Employee_Info(0l, posEmp.getID_Employee().getID_Employee(),posEmp.getID_Position().getID_Position()));
-            return new Position_Employee();
-        }
-        catch (Exception e){return null;}
-    }
 
 
-
-    @DeleteMapping("/deletePositionEmp/{id}")
-    public Position_Employee deletePosEmp(@PathVariable("id") Long id){
-        try{
-            Position_Employee posEmp = new Position_Employee();
-            posEmp.setID_Position_Employee(id);
-            allDAO.deleteToTable("Position_Employee", posEmp);
-            return new Position_Employee();
-        }
-        catch (Exception e){return null;}
-    }
-
-    @DeleteMapping("/deletePatient/{id}")
-    public Patient deletePatient(@PathVariable("id") Long id){
-        try{
-            Patient patient = new Patient();
-            patient.setID_Patient(id);
-            allDAO.deleteToTable("Patient", patient);
-            return new Patient();
-        }
-        catch (Exception e){return null;}
-    }
-
-
-
-    @PostMapping("/updatePatient/{id}")
-    public Patient updatePatient(@PathVariable("id") Long id, @RequestBody Patient patient){
-        try{
-            allDAO.updateToTable("Patient", patient, patient.getID_Patient());
-            return new Patient();
-        }
-        catch (Exception e){return null;}
-    }
 }

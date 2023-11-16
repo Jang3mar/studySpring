@@ -17,6 +17,14 @@ public class Medical_Card {
     @JoinColumn(name = "ID_Patient", nullable = false)
     private Patient ID_Pat_Card;
 
+    public Medical_Card() {}
+
+    public Medical_Card(Long ID_Med_Card, String num_Card, Patient ID_Pat_Card) {
+        this.ID_Med_Card = ID_Med_Card;
+        Num_Card = num_Card;
+        this.ID_Pat_Card = ID_Pat_Card;
+    }
+
     public Long getID_Med_Card() {
         return ID_Med_Card;
     }
