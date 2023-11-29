@@ -54,6 +54,9 @@ public class AllDAO {
             catch (SQLException e) {Logger.getAnonymousLogger().info(e.getMessage());}
         }
         catch (Exception e){Logger.getAnonymousLogger().info(e.getMessage());}
+        try{
+            connection.close();
+        } catch (SQLException e){Logger.getAnonymousLogger().warning(e.getMessage());}
     }
 
     public <T> void updateToTable(String tableName, T object, Long id){
@@ -79,6 +82,9 @@ public class AllDAO {
             catch (SQLException e) {Logger.getAnonymousLogger().info(e.getMessage());}
         }
         catch (Exception e){Logger.getAnonymousLogger().info(e.getMessage());}
+        try{
+            connection.close();
+        } catch (SQLException e){Logger.getAnonymousLogger().warning(e.getMessage());}
     }
 
     public <T> ResultSet selectToTable(String tableName, Class<?> returnClass){
@@ -105,6 +111,9 @@ public class AllDAO {
             catch (SQLException e) {Logger.getAnonymousLogger().info(e.getMessage());}
         }
         catch (Exception e){Logger.getAnonymousLogger().info(e.getMessage());}
+        try{
+            connection.close();
+        } catch (SQLException e){Logger.getAnonymousLogger().warning(e.getMessage());}
         return null;
     }
 
@@ -126,6 +135,9 @@ public class AllDAO {
             catch (SQLException e) {Logger.getAnonymousLogger().info(e.getMessage());}
         }
         catch (Exception e){Logger.getAnonymousLogger().info(e.getMessage());}
+        try{
+            connection.close();
+        } catch (SQLException e){Logger.getAnonymousLogger().warning(e.getMessage());}
     }
 
 }

@@ -16,6 +16,9 @@ public class Registration {
     @Column(name = "Time_Reg", nullable = false)
     private String Time_Reg;
 
+    @Column(name = "Des_Symptoms", nullable = true)
+    private String Des_Symptoms;
+
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "ID_Employee", nullable = false)
     private Employee ID_Employee;
@@ -26,10 +29,11 @@ public class Registration {
 
     public Registration() {}
 
-    public Registration(Long ID_Registration, String date_Reg, String time_Reg, Employee ID_Emp_Reg, Patient ID_Pat_Reg) {
+    public Registration(Long ID_Registration, String date_Reg, String time_Reg, String DesSymptoms, Employee ID_Emp_Reg, Patient ID_Pat_Reg) {
         this.ID_Registration = ID_Registration;
         Date_Reg = date_Reg;
         Time_Reg = time_Reg;
+        Des_Symptoms = DesSymptoms;
         this.ID_Employee = ID_Emp_Reg;
         this.ID_Patient = ID_Pat_Reg;
     }
@@ -72,5 +76,29 @@ public class Registration {
 
     public void setID_Pat_Reg(Patient ID_Pat_Reg) {
         this.ID_Patient = ID_Pat_Reg;
+    }
+
+    public String getDesSymptoms() {
+        return Des_Symptoms;
+    }
+
+    public void setDesSymptoms(String desSymptoms) {
+        Des_Symptoms = desSymptoms;
+    }
+
+    public Employee getID_Employee() {
+        return ID_Employee;
+    }
+
+    public void setID_Employee(Employee ID_Employee) {
+        this.ID_Employee = ID_Employee;
+    }
+
+    public Patient getID_Patient() {
+        return ID_Patient;
+    }
+
+    public void setID_Patient(Patient ID_Patient) {
+        this.ID_Patient = ID_Patient;
     }
 }

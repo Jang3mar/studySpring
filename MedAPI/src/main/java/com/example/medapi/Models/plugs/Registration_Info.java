@@ -12,14 +12,17 @@ public class Registration_Info {
 
     private String Time_Reg;
 
+    private String DesSymptoms;
+
     private Long ID_Emp_Reg;
 
     private Long ID_Pat_Reg;
 
-    public Registration_Info(Long ID_Registration, String date_Reg, String time_Reg, Long ID_Emp_Reg, Long ID_Pat_Reg) {
+    public Registration_Info(Long ID_Registration, String date_Reg, String time_Reg, String DesSymptoms,  Long ID_Emp_Reg, Long ID_Pat_Reg) {
         this.ID_Registration = ID_Registration;
         Date_Reg = date_Reg;
         Time_Reg = time_Reg;
+        DesSymptoms = DesSymptoms;
         this.ID_Emp_Reg = ID_Emp_Reg;
         this.ID_Pat_Reg = ID_Pat_Reg;
     }
@@ -62,5 +65,13 @@ public class Registration_Info {
 
     public void setID_Pat_Reg(Long ID_Pat_Reg) {
         this.ID_Pat_Reg = ID_Pat_Reg;
+    }
+
+    public String getDesSymptoms() {
+        return DesSymptoms;
+    }
+
+    public void setDesSymptoms(String desSymptoms) {
+        DesSymptoms = desSymptoms;
     }
 }

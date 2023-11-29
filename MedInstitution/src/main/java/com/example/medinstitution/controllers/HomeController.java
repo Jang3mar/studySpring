@@ -5,27 +5,18 @@ import com.example.medinstitution.models.plugs.EmpPositionForDoctorInfo;
 import com.example.medinstitution.models.plugs.EmpPositionInfo;
 import com.example.medinstitution.utilities.APIInterface;
 import com.example.medinstitution.utilities.RequestBuilder;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kotlin.text.Regex;
-import org.springframework.http.ResponseEntity;
+import org.apache.juli.logging.Log;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -43,20 +34,35 @@ public class HomeController {
         return "RegistrationWin";
     }
 
+    @GetMapping("/ReceptionWinList")
+    public String getReceptionList() {
+        return "ReceptionWinList";
+    }
+
     @GetMapping("/PatientMenu")
     public String getPatientMenu(Model model, @RequestParam(value = "typesFilter", required = false) String types){
         try{
             APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            List<DepartmentMed> depMed = api.getListDepartment().execute().body();
+            model.addAttribute("listDepartment", depMed);
             List<Registration> PE = api.getRegistrarions().execute().body();
+            Logger.getAnonymousLogger().info(PE.size() + "");
             List<EmpPositionInfo> epInfo = new ArrayList<>();
+            List<Position_Employee> posit = api.getListPosEmp().execute().body();
             for (Registration reg: PE) {
-                epInfo.add(new EmpPositionInfo(reg.getID_Emp_Reg(), reg.getDate_Reg()+" "+reg.getTime_Reg()));
+                epInfo.add(new EmpPositionInfo(
+                        reg.getID_Emp_Reg(),
+                        reg.getDate_Reg()+" "+reg.getTime_Reg(),
+                        posit.stream().filter(positionEmployee -> positionEmployee.getID_Emp_Pos().getID_Employee() == reg.getID_Emp_Reg().getID_Employee()).toList()
+                ));
             }
             Logger.getAnonymousLogger().info(types);
             if(types != null && !types.isEmpty()){
+                Logger.getAnonymousLogger().info("Im here");
                 types = types.substring(0, types.length()-1);
                 String[] typeArr = types.split(",");
                 List<EmpPositionInfo> resList = new ArrayList<>();
+                Logger.getAnonymousLogger().info(typeArr[0]);
                 for (EmpPositionInfo info: epInfo) {
                     for(int i = 0; i< typeArr.length;i++){
                         if(info.empPositions.toLowerCase().contains(typeArr[i].toLowerCase())){
@@ -68,6 +74,31 @@ public class HomeController {
                 epInfo = resList;
             }
             model.addAttribute("regs", epInfo);
+            Logger.getAnonymousLogger().info(epInfo.size()+"");
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());};
+        return "PatientMenu";
+    }
+
+    @GetMapping("/PatientMenu/Search")
+    public String getPatientMenuSearch(Model model, @RequestParam("SFM") String SFM){
+        try{
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            List<Registration> PE = api.getRegistrarions().execute().body();
+            List<EmpPositionInfo> epInfo = new ArrayList<>();
+            List<Position_Employee> posit = api.getListPosEmp().execute().body();
+            for (Registration reg: PE) {
+                epInfo.add(new EmpPositionInfo(
+                        reg.getID_Emp_Reg(),
+                        reg.getDate_Reg()+" "+reg.getTime_Reg(),
+                        posit.stream().filter(positionEmployee -> positionEmployee.getID_Emp_Pos().getID_Employee() == reg.getID_Emp_Reg().getID_Employee()).toList()
+                        ));
+            }
+            epInfo = epInfo.stream().filter(empPositionInfo -> {
+                Logger.getAnonymousLogger().info(empPositionInfo.empFIO.toLowerCase()+" "+SFM.toLowerCase());
+                return empPositionInfo.empFIO.toLowerCase().contains(SFM.toLowerCase());
+            }).toList();
+            model.addAttribute("regs", epInfo);
         }
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());};
         return "PatientMenu";
@@ -77,7 +108,7 @@ public class HomeController {
     public String getPrivateRoom(Model model, @CookieValue("userId") String id ) throws IOException {
         APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
         Patient curPatient = api.getPatient(Long.parseLong(id)).execute().body();
-        Document doc = api.getDocument(Long.parseLong(id)).execute().body();
+        Document doc = api.getDocumentId(Long.parseLong(id)).execute().body();
         LocalDateTime ldt = LocalDateTime.now();
         if(doc != null){
             model.addAttribute("docs", doc);
@@ -105,7 +136,7 @@ public class HomeController {
     @GetMapping("/EmployeeMenu")
     public String getEmployeeMenu(Model model, @CookieValue("userId") String id) throws IOException {
         APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
-        List<Registration> registrations = api.getAllRegistrarions().execute().body();
+        List<Registration> registrations = api.getListRegistrarions().execute().body();
         registrations = registrations.stream().filter(reg -> reg.getID_Emp_Reg().getID_Employee() == Long.parseLong(id)).toList();
         List<EmpPositionForDoctorInfo> allInfo = new ArrayList<>();
         for (Registration registration: registrations) {
@@ -124,10 +155,73 @@ public class HomeController {
         return "AdminPanel";
     }
 
-    @GetMapping("/AdminPanel/modelsWin/DepartamentWin")
-    public String getDepartment() {
-        return "modelsWin/DepartamentWin";
+
+    //--------------------department-----------------------------
+//    @GetMapping("/AdminPanel/modelsWin/DepartmentWin")
+//    public String getDepartment() {
+//        return "modelsWin/DepartmentWin";
+//    }
+
+    @GetMapping("/AdminPanel/modelsWin/DepartmentWin")
+    public String getDepartment(Model model) {
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            Call<List<DepartmentMed>> listDepartment = api.getListDepartment();
+            Response<List<DepartmentMed>> res = listDepartment.execute();
+            Logger.getAnonymousLogger().info(res.body().get(0).getDepartment_Name());
+            model.addAttribute("departmentList", res.body());
+        } catch (Exception e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return "modelsWin/DepartmentWin";
     }
+
+    @PostMapping("/AdminPanel/modelsWin/DepartmentWin/addDepartment")
+    public String addDepartment(Model model, @RequestParam(name = "departmentName") String departmentName) {
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            Logger.getAnonymousLogger().info(departmentName);
+            Call<DepartmentMed> newDepartment = api.addDepartment(new DepartmentMed(0l, departmentName));
+            newDepartment.execute();
+            Call<List<DepartmentMed>> listDepartment = api.getListDepartment();
+            Response<List<DepartmentMed>> res = listDepartment.execute();
+            //Logger.getAnonymousLogger().info(res.body().get(0).getPosition_Name());
+            model.addAttribute("departmentList", res.body());
+        }
+        catch (Exception e){
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return "modelsWin/DepartmentWin";}
+
+    @PostMapping("/AdminPanel/modelsWin/DepartmentWin/updateDepartment")
+    public String updateDepartment(Model model, @RequestParam(name = "departmentID") Long id, @RequestParam(name = "departmentName") String departmentName){
+        try{
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            Call<DepartmentMed> newDepartment = api.updateDepartment(id, new DepartmentMed(id, departmentName));
+            newDepartment.execute();
+            Call<List<DepartmentMed>> listDepartment = api.getListDepartment();
+            Response<List<DepartmentMed>> res = listDepartment.execute();
+            model.addAttribute("departmentList", res.body());
+        }
+        catch (Exception e) {}
+        return "modelsWin/DepartmentWin";
+    }
+
+    @PostMapping("/AdminPanel/modelsWin/DepartmentWin/deleteDepartment")
+    public String deleteDepartment(Model model, @RequestParam(name = "departmentID") Long id){
+        try{
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            Call<DepartmentMed> newDepartment = api.deleteDepartment(id);
+            newDepartment.execute();
+            Call<List<DepartmentMed>> listDepartment = api.getListDepartment();
+            Response<List<DepartmentMed>> res = listDepartment.execute();
+            model.addAttribute("departmentList", res.body());
+        }
+        catch (Exception e) {}
+        return "modelsWin/DepartmentWin";
+    }
+    //---------------------------------------------------------------
+
 
     @GetMapping("/AdminPanel/modelsWin/DiagnosisWin")
     public String getDiagnosis() {

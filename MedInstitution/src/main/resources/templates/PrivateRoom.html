@@ -31,65 +31,80 @@
 </form>
 <div class="patient-info-table">
     <form method="post" action="">
-    <div class="patient-personal-info">
-        <div>
-            <label>Фамилия</label>
-            <input th:value="${patient.getSecond_Patient()}">
-        </div>
-        <div>
-            <label>Имя</label>
-            <input th:value="${patient.getFirst_Patient()}">
-        </div>
-        <div>
-            <label>Отчество</label>
-            <input th:value="${patient.getMiddle_Patient()}">
-        </div>
-        <div>
-            <label>Дата рождения</label>
-            <input th:value="${patient.getBirthday_Patient()}">
-        </div>
-        <div>
-            <label>Логин</label>
-            <input th:value="${patient.getLogin_Patient()}">
-        </div>
-        <div>
-            <label>Пароль</label>
-            <input th:value="${patient.getPassword_Patient()}">
-        </div>
-    </div>
+    <table class="patient-private-info">
+        <tr>
+            <td>Фамилия</td>
+            <td><input th:value="${patient.getSecond_Patient()}"></td>
+        </tr>
+        <tr>
+            <td>Имя</td>
+            <td><input th:value="${patient.getFirst_Patient()}"></td>
+        </tr>
+        <tr>
+            <td>Отчество</td>
+            <td><input th:value="${patient.getMiddle_Patient()}"></td>
+        </tr>
+        <tr>
+            <td>Дата рождения</td>
+            <td><input th:value="${patient.getBirthday_Patient()}"></td>
+        </tr>
+        <tr>
+            <td>Логин</td>
+            <td><input th:value="${patient.getLogin_Patient()}"></td>
+        </tr>
+        <tr>
+            <td>Пароль</td>
+            <td><input th:value="${patient.getPassword_Patient()}"></td>
+        </tr>
+    </table>
     </form>
     <form method="post" action="/PrivateRoom/AddDocument">
-    <div class="patient-document-info" >
-        <div>
-            <label>Серия паспорта</label>
-            <input type="text" th:value="${docs.getSeries_Passport()}" name="SeriesPassport" required>
-        </div>
-        <div>
-            <label>Номер паспорта</label>
-            <input type="text" th:value="${docs.getNum_Passport()}" name="NumPassport" required>
-        </div>
-        <div>
-            <label>Дата выдачи</label>
-            <input type="datetime-local" th:value="${docs.getDate_Issue()}" name="DateIssue" required>
-        </div>
-        <div>
-            <label>Кем выдан</label>
-            <input type="text" th:value="${docs.getIssued_By()}" name="IssuedBy" required>
-        </div>
-        <div>
-            <label>Код подразделения</label>
-            <input type="text" th:value="${docs.getDep_Code()}" name="DepCode" required>
-        </div>
-        <div>
-            <label>Номер полиса</label>
-            <input type="text"  th:value="${docs.getNum_CMI()}" name="NumCMI" required>
-        </div>
-        <div class="button-styles">
-            <button>Изменить</button>
-        </div>
-    </div>
-
+        <table class="patient-private-info">
+            <tr>
+                <td>Серия паспорта</td>
+                <td><input type="text" th:value="${docs.getSeries_Passport()}" name="SeriesPassport" required></td>
+            </tr>
+            <tr>
+                <td>Номер паспорта</td>
+                <td><input type="text" th:value="${docs.getNum_Passport()}" name="NumPassport" required></td>
+            </tr>
+            <tr>
+                <td>Дата выдачи</td>
+                <td><input type="datetime-local" th:value="${docs.getDate_Issue()}" name="DateIssue" required></td>
+            </tr>
+            <tr>
+                <td>Кем выдан</td>
+                <td><input type="text" th:value="${docs.getIssued_By()}" name="IssuedBy" required></td>
+            </tr>
+            <tr>
+                <td>Код подразделения</td>
+                <td><input type="text" th:value="${docs.getDep_Code()}" name="DepCode" required></td>
+            </tr>
+            <tr>
+                <td>Номер полиса</td>
+                <td><input type="text"  th:value="${docs.getNum_CMI()}" name="NumCMI" required></td>
+            </tr>
+            <tr>
+                <td><button>Изменить</button></td>
+            </tr>
+        </table>
     </form>
+</div>
+<div class="create-line"></div>
+<div class="patient-document-import">
+    <table class="patient-import-table">
+        <tr>
+            <form>
+                <td><input></td>
+            </form>
+            <form>
+                <td><button>Скачать</button></td>
+            </form>
+            <form>
+                <td><button>Удалить</button></td>
+            </form>
+        </tr>
+    </table>
 </div>
 </body>
 </html>

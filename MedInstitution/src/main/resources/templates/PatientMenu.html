@@ -14,7 +14,7 @@
         <button class="left-button">Выйти</button>
     </form>
     <div class="patient-button-styles">
-    <form>
+    <form method="get" action="/ReceptionWinList">
         <button>Приемы</button>
     </form>
     <form>
@@ -28,15 +28,21 @@
 <div class="patient-main-panel">
     <div class="patient-search-menu">
         <div class="patient-search-table">
-            <input>
-            <button>Поиск</button>
+            <form method="get" action="/PatientMenu/Search">
+                <input name="SFM" style="font-size: 20px">
+                <button>Поиск</button>
+            </form>
+            <form method="get" action="/PatientMenu">
+                <button>Сброс</button>
+            </form>
             <div class="patient-table-main">
                 <table>
                     <tr th:each="item : ${regs}">
-                        <form>
+                        <form method="post">
                             <td><a th:text="${item.empFIO}"></a></td>
                             <td><a th:text="${item.empPositions}"></a></td>
                             <td><a th:text="${item.dateTimeRegistrarion}"></a></td>
+                            <td><button>Записаться</button></td>
                         </form>
                     </tr>
                 </table>
@@ -45,38 +51,11 @@
         <div class="patient-search-measures">
             <label>Направления</label>
             <div class="patient-item">
-                <form>
-                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="therapy" id="therapy" value="Терапевт">
-                    <label>Терапия</label>
+                <form th:each="item : ${listDepartment}">
+                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="therapy" id="therapy" th:value="${item.getDepartment_Name()}">
+                    <label th:text="${item.getDepartment_Name()}"></label>
                 </form>
-                <form>
-                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="stomatology" id="stomatology" value="Стоматолог">
-                    <label>Стоматология</label>
-                </form>
-                <form>
-                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="ginekology" id="ginekology" value="Гинеколог">
-                    <label>Гинекология</label>
-                </form>
-                <form>
-                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="nevrology" id="nevrology" value="Невролог">
-                    <label>Неврология</label>
-                </form>
-                <form>
-                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="urology" id="urology" value="Уролог">
-                    <label>Урология</label>
-                </form>
-                <form>
-                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="kardiology" id="kardiology" value="Кардиолог">
-                    <label>Кардиология</label>
-                </form>
-                <form>
-                    <input onchange="onChangeCB()" class="check_box_js_check"type="checkbox" name="lor" id="lor" value="Отоларинголог">
-                    <label>Отоларингология</label>
-                </form>
-                <form>
-                    <input onchange="onChangeCB()" class="check_box_js_check" type="checkbox" name="usi" id="usi" value="УЗИ">
-                    <label>УЗИ</label>
-                </form>
+
                 <form method="get" action="/PatientMenu">
                     <div class="button-styles">
                     <input id="types_box" name="typesFilter" hidden>

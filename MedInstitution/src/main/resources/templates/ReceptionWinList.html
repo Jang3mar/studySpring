@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Приемы</title>
+    <link rel="stylesheet" href="../static/styles.css" th:href="@{/styles.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body class="reception-body">
+<header class="header-reception">
+    <form method="get" action="/PatientMenu">
+        <div>
+            <button>Главная страница</button>
+        </div>
+    </form>
+    <form method="get" action="/PrivateRoom">
+        <div>
+            <button>Назад</button>
+        </div>
+    </form>
+</header>
+<div class="reception-list-info">
+    <form method="post" action="">
+    <table class="reception-table">
+        <tr>
+            <td>Врач: <input></td>
+            <td>Дата: <input></td>
+            <td>Время: <input></td>
+            <td><button>Скачать назначение</button></td>
+            <td><button>Скачать справку</button></td>
+        </tr>
+    </table>
+    </form>
+</div>
+</body>
+</html>

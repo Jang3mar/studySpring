@@ -13,6 +13,9 @@ public class Registration {
     @SerializedName(value = "time_Reg")
     private String Time_Reg;
 
+    @SerializedName(value = "des_Symptoms")
+    private String Des_Symptoms;
+
     @SerializedName(value = "id_Emp_Reg")
     private Employee ID_Emp_Reg;
 
@@ -21,10 +24,11 @@ public class Registration {
 
     public Registration() {}
 
-    public Registration(Long ID_Registration, String date_Reg, String time_Reg, Employee ID_Emp_Reg, Patient ID_Pat_Reg) {
+    public Registration(Long ID_Registration, String date_Reg, String time_Reg, String DesSymptoms,  Employee ID_Emp_Reg, Patient ID_Pat_Reg) {
         this.ID_Registration = ID_Registration;
         Date_Reg = date_Reg;
         Time_Reg = time_Reg;
+        Des_Symptoms = DesSymptoms;
         this.ID_Emp_Reg = ID_Emp_Reg;
         this.ID_Pat_Reg = ID_Pat_Reg;
     }
@@ -67,5 +71,13 @@ public class Registration {
 
     public void setID_Pat_Reg(Patient ID_Pat_Reg) {
         this.ID_Pat_Reg = ID_Pat_Reg;
+    }
+
+    public String getDesSymptoms() {
+        return Des_Symptoms;
+    }
+
+    public void setDesSymptoms(String desSymptoms) {
+        Des_Symptoms = desSymptoms;
     }
 }

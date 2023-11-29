@@ -24,7 +24,7 @@ public class HomeController {
     //"/getPosition"
     @GetMapping(value = "/getPosition")
     @ResponseBody
-    public List<Position> returnPosition(){
+    public List<Position> returnPosition() throws SQLException {
         List<Position> positionList = new ArrayList<>();
         ResultSet res = allDAO.selectToTable("Position", Position.class);
         try {
@@ -42,7 +42,7 @@ public class HomeController {
 
     @GetMapping("/getPosition/{id}")
     @ResponseBody
-    public Position returnPosition(@PathVariable("id") Long id){
+    public Position returnPosition(@PathVariable("id") Long id) throws SQLException {
         List<Position> positionList = returnPosition();
         return positionList.stream().filter(position -> position.getID_Position() == id).findAny().orElse(null);
     }
@@ -84,7 +84,7 @@ public class HomeController {
     @ResponseBody
     public List<DepartmentMed> returnDepartment(){
         List<DepartmentMed> departmentList = new ArrayList<>();
-        ResultSet res = allDAO.selectToTable("DepartmentMed", DepartmentMed.class);
+        ResultSet res = allDAO.selectToTable("Department_Med", DepartmentMed.class);
         try {
             DepartmentMed departmentMed = new DepartmentMed();
             while (res.next()) {
@@ -108,7 +108,7 @@ public class HomeController {
     @PostMapping(value = "/addDepartmentMed")
     public DepartmentMed addDepartment(@RequestBody DepartmentMed departmentMed){
         try{
-            allDAO.addToTable("DepartmentMed", departmentMed);
+            allDAO.addToTable("Department_Med", departmentMed);
             return new DepartmentMed();
         }
         catch (Exception e){return null;}
@@ -117,7 +117,7 @@ public class HomeController {
     @PostMapping("/updateDepartmentMed/{id}")
     public DepartmentMed updateDepartment(@PathVariable("id") Long id, @RequestBody DepartmentMed departmentMed){
         try{
-            allDAO.updateToTable("DepartmentMed", departmentMed, departmentMed.getID_Dep_Med());
+            allDAO.updateToTable("Department_Med", departmentMed, departmentMed.getID_Dep_Med());
             return new DepartmentMed();
         }
         catch (Exception e){return null;}
@@ -128,7 +128,7 @@ public class HomeController {
         try{
             DepartmentMed departmentMed = new DepartmentMed();
             departmentMed.setID_Dep_Med(id);
-            allDAO.deleteToTable("DepartmentMed", departmentMed);
+            allDAO.deleteToTable("Department_Med", departmentMed);
             return new DepartmentMed();
         }
         catch (Exception e){return null;}
@@ -560,6 +560,9 @@ public class HomeController {
         catch (Exception e){return null;}
     }
 
+//    @GetMapping("/getEmployeeByDepartment")
+//    public List<Employee>
+
     //-------------------------------------------
 
     //------------должность сотрудника-----------
@@ -644,8 +647,8 @@ public class HomeController {
         try {
             Med_Reference medRef = new Med_Reference();
             while (res.next()) {
-                Reception reception = returnReception(res.getLong(4));
-                medRef = new Med_Reference(res.getLong(1), res.getString(2), res.getString(3), reception);
+                // Reception reception = returnReception(res.getLong(4));
+                //medRef = new Med_Reference(res.getLong(1), res.getString(2), res.getString(3), reception);
                 medRefList.add(medRef);
             }
         }
@@ -663,8 +666,8 @@ public class HomeController {
         try{
             Med_Reference medReference = new Med_Reference();
             while (res.next()){
-                Reception reception = returnReception(res.getLong(5));
-                medReference = new Med_Reference(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), reception);
+                //Reception reception = returnReception(res.getLong(5));
+                //medReference = new Med_Reference(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), reception);
                 medRefList.add(medReference);
             }
         }
@@ -762,7 +765,7 @@ public class HomeController {
         catch (Exception e){return null;}
     }
 
-    @DeleteMapping("/deleteEduEmp/{id}")
+    @DeleteMapping("/deletePatientMedCard/{id}")
     public Patient_Med_Card deletePatientMedCard(@PathVariable("id") Long id){
         try{
             Patient_Med_Card patientMedCard = new Patient_Med_Card();
@@ -854,9 +857,9 @@ public class HomeController {
         try{
             Reception reception = new Reception();
             while (res.next()){
-                Registration registration = returnRegistration(res.getLong(4));
-                Diagnosis diagnosis = returnDiagnosis(res.getLong(5));
-                reception = new Reception(res.getLong(1), res.getString(2), res.getString(3), res.getLong(4), res.getLong(5));
+              //  Registration registration = returnRegistration(res.getLong(4));
+                //Diagnosis diagnosis = returnDiagnosis(res.getLong(5));
+                //reception = new Reception(res.getLong(1), res.getString(2), res.getString(3), res.getLong(4), res.getLong(5));
                 receptionList.add(reception);
             }
         }
@@ -876,7 +879,7 @@ public class HomeController {
         try{
             //Logger.getLogger("Logas").info(posEmp.getID_Position().getPosition_Name());
 
-            allDAO.addToTable("Reception", new Reception(0l, reception.getID_Reg_Rec().getID_Registration(),reception.getID_Dig_Rec().getID_Diagnosis()));
+           // allDAO.addToTable("Reception", new Reception(0l, reception.getID_Reg_Rec().getID_Registration(),reception.getID_Dig_Rec().getID_Diagnosis()));
             return new Reception();
         }
         catch (Exception e){return null;}
@@ -919,13 +922,24 @@ public class HomeController {
     public List<Registration> getFreeRegistration(){
         List<Registration> registrationList = new ArrayList<>();
         ResultSet res = allDAO.selectToTable("Registration", Registration.class);
+        List<Employee> employees = returnEmployee();
         try {
             Registration registration = new Registration();
             if(res != null)
                 while (res.next()) {
-                    Patient pt = returnPatient(res.getLong(5));
-                    registration = new Registration(res.getLong(1), res.getString(2),res.getString(3), returnEmployee(res.getLong(4)),pt);
-                    if(pt == null) registrationList.add(registration);
+                    Logger.getLogger("LONGER").info(res.getLong(5)+"");
+                    registration = new Registration(res.getLong(1),
+                            res.getString(2),res.getString(3),
+                            res.getString(4),
+                            employees.stream().filter(emp -> {
+                                try {
+                                    return emp.getID_Employee() == res.getLong(5);
+                                } catch (SQLException e) {
+                                    return false;
+                                }
+                            }).findFirst().orElse(null),
+                            new Patient());
+                    if(res.getLong(6) == 0) registrationList.add(registration);
                 }
         }
         catch (SQLException e) {
@@ -943,7 +957,7 @@ public class HomeController {
             if(res != null)
                 while (res.next()) {
                     Patient pt = returnPatient(res.getLong(5));
-                    registration = new Registration(res.getLong(1), res.getString(2),res.getString(3), returnEmployee(res.getLong(4)),pt);
+                    registration = new Registration(res.getLong(1), res.getString(2),res.getString(3), res.getString(4), returnEmployee(res.getLong(5)),pt);
                     registrationList.add(registration);
                 }
         }
@@ -965,7 +979,7 @@ public class HomeController {
             map.put("id", pat.getID_Patient());
         }
         List<Employee> employeeList = returnEmployee();
-        Logger.getAnonymousLogger().info(employeeList.get(0).getSecond_Employee());
+        //Logger.getAnonymousLogger().info(employeeList.get(0).getSecond_Employee());
         Employee emp = employeeList.stream().filter(employee -> employee.getLogin_Employee().equals(login) && employee.getPassword_Employee().equals(password)).findAny().orElse(null);
         if(emp != null){
             List<Position_Employee> posEmp = returnPosEmployee().stream().filter(emp1 -> emp1.getID_Employee().getID_Employee() == emp.getID_Employee()).toList();
