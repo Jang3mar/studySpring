@@ -30,6 +30,14 @@ public class read_all_registrations {
         this.departments = departments;
     }
 
+    public String getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(String departments) {
+        this.departments = departments;
+    }
+
     public Long getId_registration() {
         return id_registration;
     }
@@ -108,13 +116,5 @@ public class read_all_registrations {
 
     public void setId_patient(Long id_patient) {
         this.id_patient = id_patient;
-    }
-
-    public String getDepartments() {
-        return departments;
-    }
-
-    public void setDepartments(String departments) {
-        this.departments = departments;
     }
 }

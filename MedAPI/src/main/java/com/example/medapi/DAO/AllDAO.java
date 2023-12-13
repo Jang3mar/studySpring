@@ -24,7 +24,7 @@ public class AllDAO {
 
     public static Statement state;
     public <T> void addToTable(String tableName, T object){
-        if(tableName.toLowerCase() == "loggers") return;
+        if(tableName.toLowerCase().equals("loggers")) return;
         Long id = 1l;
         Class<?> newClass = object.getClass();
         Connection connection = getConnections();
@@ -71,6 +71,60 @@ public class AllDAO {
                     state.executeUpdate(query);
                     String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toString() + "')";
                     state.executeUpdate(queryLog);
+                }
+            }
+            catch (SQLException e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        }
+        catch (Exception e){Logger.getAnonymousLogger().info(e.getMessage());}
+        try{
+            connection.close();
+        } catch (SQLException e){Logger.getAnonymousLogger().warning(e.getMessage());}
+    }
+    public <T> void noLogAdd(String tableName, T object){
+        Long id = 1l;
+        Class<?> newClass = object.getClass();
+        Connection connection = getConnections();
+        try {
+            try {
+                if (connection != null) {
+                    String fieldName = "";
+                    String fieldValue = "";
+                    state = connection.createStatement();
+                    Field[] field = newClass.getDeclaredFields();
+                    field[0].setAccessible(true);
+                    String querySel = "SELECT " + field[0].getName() + " FROM " + tableName + " ORDER BY " + field[0].getName() + " DESC";
+                    Statement stateQuery = connection.createStatement();
+                    ResultSet resState = stateQuery.executeQuery(querySel);
+                    if (resState.next()){
+                        id = resState.getLong(1) + 1l;
+                    }
+                    field[0].set(object, id);
+                    for (Field fields : field) {
+                        fields.setAccessible(true);
+                        fieldName += fields.getName() + ",";
+                        if (fields.getName().toLowerCase().contains("login") ||
+                                fields.getName().toLowerCase().contains("password") ||
+                                fields.getName().toLowerCase().contains("series_passport") ||
+                                fields.getName().toLowerCase().contains("num_passport") ||
+                                fields.getName().toLowerCase().contains("num_cmi")) {
+                            fieldValue += "'" + Crypto.encrypt(fields.get(object).toString()) + "'" + ",";
+                        }
+                        else{
+                            fieldValue += "'" + fields.get(object) + "'" + ",";
+                        }
+                    }
+                    fieldName = fieldName.substring(0, fieldName.length() - 1);
+                    fieldValue = fieldValue.substring(0, fieldValue.length() - 1);
+                    Logger.getAnonymousLogger().info(field.length + "");
+                    String query = "INSERT INTO " + tableName + " (" + fieldName + ")" + " VALUES (" + fieldValue + ")";
+                    Logger.getAnonymousLogger().info(query);
+                    querySel = "SELECT id_log FROM Loggers ORDER BY id_log DESC";
+                    stateQuery = connection.createStatement();
+                    resState = stateQuery.executeQuery(querySel);
+                    if (resState.next()){
+                        id = resState.getLong(1) + 1l;
+                    }
+                    state.executeUpdate(query);
                 }
             }
             catch (SQLException e) {Logger.getAnonymousLogger().info(e.getMessage());}

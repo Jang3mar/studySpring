@@ -59,7 +59,7 @@ public class HomeController {
                 Logger.getAnonymousLogger().info(typeArr[0]);
                 for (read_all_registrations info: readAllRegs) {
                     for(int i = 0; i< typeArr.length;i++){
-                        if(info.getPositions().toLowerCase().contains(typeArr[i].toLowerCase())){
+                        if(info.getDepartments().toLowerCase().contains(typeArr[i].toLowerCase())){
                             resList.add(info);
                             break;
                         }

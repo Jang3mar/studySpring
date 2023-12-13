@@ -30,6 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.KeySpec;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -1140,6 +1141,13 @@ public class HomeController {
             map.put("type", "E");
             map.put("id", emp.getID_Employee());
         }
+        String enteranceString = "";
+        if(map.containsKey("type")){
+            enteranceString = map.get("type").equals("P") ? "Вход пациента с id - ": "Вход сотрудника с id - ";
+            enteranceString += map.get("id");
+            allDAO.noLogAdd("Loggers",new Loggers(0l,enteranceString, LocalDateTime.now().toLocalDate().toString()));
+        }
+
         return map;
     }
 
