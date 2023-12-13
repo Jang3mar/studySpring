@@ -3,6 +3,7 @@ package com.example.medapi.controllers;
 import com.example.medapi.DAO.AllDAO;
 import com.example.medapi.Models.*;
 import com.example.medapi.Models.plugs.*;
+import com.example.medapi.Models.views.read_all_receptions;
 import com.example.medapi.Models.views.read_all_registrations;
 import com.example.medapi.modifies.BackupBase;
 import com.example.medapi.modifies.Crypto;
@@ -289,7 +290,7 @@ public class HomeController {
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
         return patientList;
     }
-//нихуя не поняла
+
     @GetMapping("/getPatient/{id}")
     @ResponseBody
     public Patient returnPatient(@PathVariable("id") Long id){
@@ -298,6 +299,7 @@ public class HomeController {
             Patient pat = patientList.stream().filter(patient -> patient.getID_Patient() == id).findAny().orElse(null);
             //pat.setLogin_Patient(reverseHashString(pat.getLogin_Patient()));
             //pat.setPassword_Patient(reverseHashString(pat.getPassword_Patient()));
+            pat.setLogin_Patient(Crypto.decrypt(pat.getLogin_Patient()));
             return pat;
         }
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
@@ -1021,17 +1023,40 @@ public class HomeController {
         return registrationList.stream().filter(registration -> registration.getID_Registration() == id).findAny().orElse(null);
     }
 
-    @PostMapping("/updateRegistration/{id}")
+    @PostMapping("/updateRegPatient/{id}")
     public Registration updateRegistration(@PathVariable("id") Long id, @RequestParam("idUser") Long idUser){
         try{
+            if(idUser == 0) {
+                Logger.getAnonymousLogger().info("This");
+                Registration regs = returnRegistrationId(id);
+                Registration_Info registrationInfo = new Registration_Info(regs.getID_Registration(), regs.getDate_Reg(), regs.getTime_Reg(), "", regs.getID_Employee().getID_Employee(), null);
+                allDAO.updateToTable("Registration", registrationInfo, registrationInfo.getID_Registration());
+            }
+            else{
+                Registration regs = returnRegistrationId(id);
+                Registration_Info registrationInfo = new Registration_Info(regs.getID_Registration(), regs.getDate_Reg(), regs.getTime_Reg(), regs.getDes_Symptoms(), regs.getID_Employee().getID_Employee(), idUser);
+                allDAO.updateToTable("Registration", registrationInfo, registrationInfo.getID_Registration());
+            }
+            return new Registration();
+        }
+        catch (Exception e){Logger.getAnonymousLogger().info(e.getMessage());}
+        return null;
+    }
+
+    @PostMapping("/updateRegistrations/{id}")
+    public Registration updateRegistration(@PathVariable("id") Long id, @RequestBody Registration registration){
+        try{
             Registration regs = returnRegistrationId(id);
-            Registration_Info registrationInfo = new Registration_Info(regs.getID_Registration(), regs.getDate_Reg(), regs.getTime_Reg(), regs.getDes_Symptoms(), regs.getID_Employee().getID_Employee(), idUser);
+            regs.setDes_Symptoms(registration.getDes_Symptoms());
+            Logger.getAnonymousLogger().info("Here");
+            Registration_Info registrationInfo = new Registration_Info(regs.getID_Registration(), regs.getDate_Reg(), regs.getTime_Reg(), regs.getDes_Symptoms(), regs.getID_Employee().getID_Employee(), regs.getID_Patient().getID_Patient());
             allDAO.updateToTable("Registration", registrationInfo, registrationInfo.getID_Registration());
             return new Registration();
         }
         catch (Exception e){Logger.getAnonymousLogger().info(e.getMessage());}
         return null;
     }
+
 
     @GetMapping("/getAllRegistrationsView")
     public List<read_all_registrations> readAllRegistrations(){
@@ -1041,7 +1066,7 @@ public class HomeController {
             read_all_registrations read_all_registrations = new read_all_registrations();
             if(res != null)
                 while (res.next()) {
-                    read_all_registrations = new read_all_registrations(res.getLong(1), res.getLong(2), res.getLong(3), res.getString(4), res.getString(5), res.getString(6), res.getString(7), res.getString(8), res.getString(9), res.getString(10));
+                    read_all_registrations = new read_all_registrations(res.getLong(1), res.getLong(2), res.getLong(3), res.getString(4), res.getString(5), res.getString(6), res.getString(7), res.getString(8), res.getString(9), res.getString(10), res.getString(11));
                     readRegs.add(read_all_registrations);
                 }
         }
@@ -1049,6 +1074,24 @@ public class HomeController {
             Logger.getAnonymousLogger().info(e.getMessage());
         }
         return readRegs;
+    }
+
+    @GetMapping("/getAllReceptionView")
+    public List<read_all_receptions> readAllReceptions(){
+        List<read_all_receptions> readRec = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("read_all_receptions", read_all_receptions.class);
+        try {
+            read_all_receptions readAllReceptions = new read_all_receptions();
+            if(res != null)
+                while (res.next()) {
+                    readAllReceptions = new read_all_receptions(res.getLong(1), res.getLong(2), res.getLong(3), res.getLong(4), res.getString(5), res.getString(6), res.getString(7), res.getString(8), res.getString(9), res.getString(10), res.getString(11), res.getString(12), res.getString(13), res.getString(14));
+                    readRec.add(readAllReceptions);
+                }
+        }
+        catch (Exception e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return readRec;
     }
 
     @GetMapping("/getLogIn")

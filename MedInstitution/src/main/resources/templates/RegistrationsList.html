@@ -23,19 +23,23 @@
 </header>
 </body>
 <div class="registrations-panel">
-    <form>
         <table class="registration-table">
-            <tr>
-                <form>
-                    <td><a>Дата</a></td>
-                    <td><a>Время</a></td>
-                    <td><a>Врач</a></td>
-                    <td><input type="text"></td>
+            <tr th:each="item : ${regList}">
+                <form method="post" action="/addSymptoms">
+                    <input th:value="${item.id_registration}" name="idReg" hidden>
+                    <td><a th:text="${item.date_reg}">Дата</a></td>
+                    <td><a th:text="${item.time_reg}">Время</a></td>
+                    <td><a th:text="${item.second_employee + ' ' + item.first_employee + ' ' + item.middle_employee}">Врач</a></td>
+                    <td><textarea name="des_symptoms" th:text="${item.des_symptoms}"></textarea></td>
                     <td><button>Сохранить</button></td>
-                    <td><button>Отменить запись</button></td>
                 </form>
+                <td>
+                    <form method="post" action="/patientRegistrationsDelete">
+                        <input th:value="${item.id_registration}" name="idReg" hidden>
+                        <button>Отменить запись</button>
+                    </form>
+                </td>
             </tr>
         </table>
-    </form>
 </div>
 </html>

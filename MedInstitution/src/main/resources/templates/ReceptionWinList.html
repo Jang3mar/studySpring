@@ -22,13 +22,13 @@
     </form>
 </header>
 <div class="reception-list-info">
-    <form method="post" action="">
+    <form method="get" action="">
     <table class="reception-table">
-        <tr>
-            <td>Врач: <input></td>
-            <td>Дата: <input></td>
-            <td>Время: <input></td>
-            <td><button>Скачать назначение</button></td>
+        <tr th:each="item : ${receptionsList}">
+            <td>Врач: <a th:text="${item.second_employee + ' ' + item.first_employee + ' ' + item.middle_employee}"></a></td>
+            <td>Дата: <a th:text="${item.date_reception}"></a></td>
+            <td>Время: <a th:text="${item.time_reception}"></a></td>
+            <td><button>Скачать результаты приема</button></td>
             <td><button>Скачать справку</button></td>
         </tr>
     </table>

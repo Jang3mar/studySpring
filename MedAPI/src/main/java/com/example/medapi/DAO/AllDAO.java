@@ -106,6 +106,7 @@ public class AllDAO {
                     fieldName = fieldName.substring(0, fieldName.length() - 1);
                     Logger.getAnonymousLogger().info(field.length + "");
                     String query = "UPDATE " +  tableName + " SET " + fieldName + " WHERE " + field[0].getName() + " = " + id;
+                    query = query.replace("'null'", "null");
                     Logger.getAnonymousLogger().info(query);
                     state.executeUpdate(query);
                     String querySel = "SELECT id_log FROM Loggers ORDER BY id_log DESC";

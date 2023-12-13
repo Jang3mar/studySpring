@@ -659,13 +659,14 @@
     padding: 10px;
 }
 
-.registration-table input{
-    width: 800px;
+.registration-table textarea{
+    width: 700px;
     height: 100px;
     font-size: 18px;
     border: 1px solid #083de1;
     word-wrap: break-word;
     padding: 12px 20px;
+    resize: none;
 }
 
 .registration-table button{

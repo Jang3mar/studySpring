@@ -12,10 +12,11 @@ public class read_all_registrations {
     private String first_employee;
     private String middle_employee;
     private String positions;
+    private String departments;
 
     public read_all_registrations() {}
 
-    public read_all_registrations(Long id_registration, Long id_employee, Long id_patient, String date_reg, String time_reg, String des_symptoms, String second_employee, String first_employee, String middle_employee, String positions) {
+    public read_all_registrations(Long id_registration, Long id_employee, Long id_patient, String date_reg, String time_reg, String des_symptoms, String second_employee, String first_employee, String middle_employee, String positions, String departments) {
         this.id_registration = id_registration;
         this.id_employee = id_employee;
         this.id_patient = id_patient;
@@ -26,6 +27,7 @@ public class read_all_registrations {
         this.first_employee = first_employee;
         this.middle_employee = middle_employee;
         this.positions = positions;
+        this.departments = departments;
     }
 
     public Long getId_registration() {
@@ -106,5 +108,13 @@ public class read_all_registrations {
 
     public void setId_patient(Long id_patient) {
         this.id_patient = id_patient;
+    }
+
+    public String getDepartments() {
+        return departments;
+    }
+
+    public void setDepartments(String departments) {
+        this.departments = departments;
     }
 }

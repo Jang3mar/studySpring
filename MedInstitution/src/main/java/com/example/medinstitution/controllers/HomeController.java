@@ -4,6 +4,7 @@ import com.example.medinstitution.models.*;
 import com.example.medinstitution.models.plugs.EmpPositionForDoctorInfo;
 import com.example.medinstitution.models.plugs.EmpPositionInfo;
 import com.example.medinstitution.models.plugs.Registation_Info;
+import com.example.medinstitution.models.views.read_all_receptions;
 import com.example.medinstitution.models.views.read_all_registrations;
 import com.example.medinstitution.utilities.APIInterface;
 import com.example.medinstitution.utilities.RequestBuilder;
@@ -39,18 +40,15 @@ public class HomeController {
 //    @GetMapping("/SysAdminMenu")
 //    public String getSysAdmin() {return "SysAdminMenu";}
 
-    @GetMapping("/ReceptionWinList")
-    public String getReceptionList() {
-        return "ReceptionWinList";
-    }
 
     @GetMapping("/PatientMenu")
     public String getPatientMenu(Model model, @RequestParam(value = "typesFilter", required = false) String types){
         try{
             APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
             List<read_all_registrations> readAllRegs = api.readAllRegistrations().execute().body();
-            Logger.getAnonymousLogger().info(readAllRegs.size()+"");
-            Logger.getAnonymousLogger().info(readAllRegs.get(0).getId_patient().toString());
+            List<DepartmentMed> departmentList = api.getListDepartment().execute().body();
+//            Logger.getAnonymousLogger().info(readAllRegs.size()+"");
+//            Logger.getAnonymousLogger().info(readAllRegs.get(0).getId_patient().toString());
             readAllRegs = readAllRegs.stream().filter(readAllRegistrations -> readAllRegistrations.getId_patient() == 0).toList();
             Logger.getAnonymousLogger().info(types);
             if(types != null && !types.isEmpty()){
@@ -70,6 +68,7 @@ public class HomeController {
                 readAllRegs = resList;
             }
             model.addAttribute("regs", readAllRegs);
+            model.addAttribute("listDepartment", departmentList);
             Logger.getAnonymousLogger().info(readAllRegs.size()+"");
         }
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());};
@@ -98,6 +97,19 @@ public class HomeController {
         }
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());};
         return "PatientMenu";
+    }
+
+    @GetMapping("/ReceptionWinList")
+    private String getPastReceptionsPat(Model model){
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            List<read_all_receptions> listReceptions = api.readAllReceptions().execute().body();
+//            Logger.getAnonymousLogger().info(res.body().get(0).getDepartment_Name());
+            model.addAttribute("receptionsList", listReceptions);
+        } catch (Exception e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return "ReceptionWinList";
     }
 
     @GetMapping("/PrivateRoom")
@@ -130,8 +142,30 @@ public class HomeController {
     }
 
     @GetMapping("/RegistrationsList")
-    private String getRegistrationsList(){
+    private String getRegistrationsList(Model model, @CookieValue("userId") String userId){
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            List<read_all_registrations> registrations = api.readAllRegistrations().execute().body();
+            registrations = registrations.stream().filter(reg -> reg.getId_patient() == Long.parseLong(userId)).toList();
+            model.addAttribute("regList", registrations);
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
         return "RegistrationsList";
+    }
+
+    @PostMapping("/addSymptoms")
+    private String updateRegsInfo(@RequestParam("idReg") Long idReg, @RequestParam("des_symptoms") String des_symptoms){
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            Call<Registration> updateReg = api.returnRegistrationId(idReg);
+            Registration registration = updateReg.execute().body();
+            registration.setDes_Symptoms(des_symptoms);
+            Call<Registration> updateExec = api.updateRegistration(idReg, registration);
+            updateExec.execute();
+            Logger.getAnonymousLogger().info("AAAAAAAAAAAAAAA");
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return "redirect:/RegistrationsList";
     }
 
     @GetMapping("/EmployeeMenu")
@@ -580,10 +614,23 @@ public class HomeController {
             APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
                 Registration reg = new Registration();
                 //Logger.getAnonymousLogger().info(reg.getID_Emp_Reg().getID_Employee().toString());
-                Call<Registration> updateExec = api.updateRegistration(Long.valueOf(idReg), Long.parseLong(cookieId));
+                Call<Registration> updateExec = api.updateRegPatient(Long.valueOf(idReg), Long.parseLong(cookieId));
                 updateExec.execute();
         }
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
         return "redirect:/PatientMenu";
+    }
+
+    @PostMapping("/patientRegistrationsDelete")
+    public String deleteRegPatient (@RequestParam("idReg") int idReg){
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            Registration reg = new Registration();
+            //Logger.getAnonymousLogger().info(reg.getID_Emp_Reg().getID_Employee().toString());
+            Call<Registration> updateExec = api.updateRegPatient(Long.valueOf(idReg), 0l);
+            updateExec.execute();
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return "redirect:/RegistrationsList";
     }
 }

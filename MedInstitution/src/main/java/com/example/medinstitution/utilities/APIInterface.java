@@ -2,6 +2,7 @@ package com.example.medinstitution.utilities;
 
 import com.example.medinstitution.models.*;
 import com.example.medinstitution.models.plugs.Registation_Info;
+import com.example.medinstitution.models.views.read_all_receptions;
 import com.example.medinstitution.models.views.read_all_registrations;
 import jakarta.annotation.Resource;
 import org.apache.juli.logging.Log;
@@ -256,14 +257,20 @@ public interface APIInterface {
 
     @DELETE("/deleteReception/{id}")
     public Call<Reception> deleteReception(@Path("id") Long id);
+
+    @GET("/getAllReceptionView")
+    public Call<List<read_all_receptions>> readAllReceptions();
     //------------------------------------
 
     //------------запись---------------
     @GET("/getRegistration/{id}")
     public Call<Registration> returnRegistrationId(@Path("id") Long id);
 
-    @POST("/updateRegistration/{id}")
-    public Call<Registration> updateRegistration(@Path("id") Long id, @Query("idUser") Long idUser);
+    @POST("/updateRegPatient/{id}")
+    public Call<Registration> updateRegPatient(@Path("id") Long id, @Query("idUser") Long idUser);
+
+    @POST("/updateRegistrations/{id}")
+    public Call<Registration> updateRegistration(@Path("id") Long id, @Body Registration registration);
 
     @GET("/getAllRegistrationsView")
     public Call<List<read_all_registrations>> readAllRegistrations();
