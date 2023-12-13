@@ -1,7 +1,11 @@
 package com.example.medapi.DAO;
 
+import com.example.medapi.modifies.Crypto;
+
+import javax.management.Query;
 import java.lang.reflect.Field;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
 public class AllDAO {
@@ -20,6 +24,7 @@ public class AllDAO {
 
     public static Statement state;
     public <T> void addToTable(String tableName, T object){
+        if(tableName.toLowerCase() == "loggers") return;
         Long id = 1l;
         Class<?> newClass = object.getClass();
         Connection connection = getConnections();
@@ -41,14 +46,31 @@ public class AllDAO {
                     for (Field fields : field) {
                         fields.setAccessible(true);
                         fieldName += fields.getName() + ",";
-                        fieldValue += "'" + fields.get(object) + "'" + ",";
+                        if (fields.getName().toLowerCase().contains("login") ||
+                                fields.getName().toLowerCase().contains("password") ||
+                                fields.getName().toLowerCase().contains("series_passport") ||
+                                fields.getName().toLowerCase().contains("num_passport") ||
+                                fields.getName().toLowerCase().contains("num_cmi")) {
+                            fieldValue += "'" + Crypto.encrypt(fields.get(object).toString()) + "'" + ",";
+                        }
+                        else{
+                            fieldValue += "'" + fields.get(object) + "'" + ",";
+                        }
                     }
                     fieldName = fieldName.substring(0, fieldName.length() - 1);
                     fieldValue = fieldValue.substring(0, fieldValue.length() - 1);
                     Logger.getAnonymousLogger().info(field.length + "");
                     String query = "INSERT INTO " + tableName + " (" + fieldName + ")" + " VALUES (" + fieldValue + ")";
                     Logger.getAnonymousLogger().info(query);
+                    querySel = "SELECT id_log FROM Loggers ORDER BY id_log DESC";
+                    stateQuery = connection.createStatement();
+                    resState = stateQuery.executeQuery(querySel);
+                    if (resState.next()){
+                        id = resState.getLong(1) + 1l;
+                    }
                     state.executeUpdate(query);
+                    String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toString() + "')";
+                    state.executeUpdate(queryLog);
                 }
             }
             catch (SQLException e) {Logger.getAnonymousLogger().info(e.getMessage());}
@@ -70,13 +92,31 @@ public class AllDAO {
                     Field[] field = newClass.getDeclaredFields();
                     for (Field fields : field) {
                         fields.setAccessible(true);
-                        fieldName += fields.getName() + "='" + fields.get(object) + "',";
+                        if (fields.getName().toLowerCase().contains("login") ||
+                                fields.getName().toLowerCase().contains("password") ||
+                                fields.getName().toLowerCase().contains("series_passport") ||
+                                fields.getName().toLowerCase().contains("num_passport") ||
+                                fields.getName().toLowerCase().contains("num_cmi")) {
+                            fieldName += fields.getName() + "='" + Crypto.encrypt(fields.get(object).toString()) + "',";
+                        }
+                        else{
+                            fieldName += fields.getName() + "='" + fields.get(object) + "',";
+                        }
                     }
                     fieldName = fieldName.substring(0, fieldName.length() - 1);
                     Logger.getAnonymousLogger().info(field.length + "");
                     String query = "UPDATE " +  tableName + " SET " + fieldName + " WHERE " + field[0].getName() + " = " + id;
                     Logger.getAnonymousLogger().info(query);
                     state.executeUpdate(query);
+                    String querySel = "SELECT id_log FROM Loggers ORDER BY id_log DESC";
+                    state = connection.createStatement();
+                    ResultSet resState = state.executeQuery(querySel);
+                    if (resState.next()){
+                        id = resState.getLong(1) + 1l;
+                    }
+                    state.executeUpdate(query);
+                    String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toString() + "')";
+                    state.executeUpdate(queryLog);
                 }
             }
             catch (SQLException e) {Logger.getAnonymousLogger().info(e.getMessage());}
@@ -130,6 +170,16 @@ public class AllDAO {
                     String query = "DELETE FROM " + tableName + " WHERE " + field[0].getName() + " = " + field[0].get(object);
                     Logger.getAnonymousLogger().info(query);
                     state.executeUpdate(query);
+                    String querySel = "SELECT id_log FROM Loggers ORDER BY id_log DESC";
+                    state = connection.createStatement();
+                    ResultSet resState = state.executeQuery(querySel);
+                    Long id = 1l;
+                    if (resState.next()){
+                        id = resState.getLong(1) + 1l;
+                    }
+                    state.executeUpdate(query);
+                    String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toString() + "')";
+                    state.executeUpdate(queryLog);
                 }
             }
             catch (SQLException e) {Logger.getAnonymousLogger().info(e.getMessage());}

@@ -1,7 +1,10 @@
 package com.example.medinstitution.utilities;
 
 import com.example.medinstitution.models.*;
+import com.example.medinstitution.models.plugs.Registation_Info;
+import com.example.medinstitution.models.views.read_all_registrations;
 import jakarta.annotation.Resource;
+import org.apache.juli.logging.Log;
 import org.jetbrains.annotations.PropertyKey;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +19,12 @@ import java.util.Map;
 import java.util.Objects;
 
 public interface APIInterface {
+
+    @GET("/AdminPanel/addBackup")
+    public Call<ResponseEntity<String>> getBackup();
+
+    @GET("/SysAdminMenu")
+    public Call<List<Loggers>> getLoggers();
 
     //------------отделение---------------
     @GET("/getDepartmentMed")
@@ -250,6 +259,14 @@ public interface APIInterface {
     //------------------------------------
 
     //------------запись---------------
+    @GET("/getRegistration/{id}")
+    public Call<Registration> returnRegistrationId(@Path("id") Long id);
+
+    @POST("/updateRegistration/{id}")
+    public Call<Registration> updateRegistration(@Path("id") Long id, @Query("idUser") Long idUser);
+
+    @GET("/getAllRegistrationsView")
+    public Call<List<read_all_registrations>> readAllRegistrations();
     //------------------------------------
 
     @GET("/getLogIn")

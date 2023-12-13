@@ -636,3 +636,149 @@
     text-transform: uppercase;
     color: #EDF5FF;
 }
+
+/*окно с записями*/
+.patient-button-styles button{
+    border: none;
+    border-radius: 3px;
+    height: 37px;
+    width: 200px;
+    font-size: 14px;
+    background: #3D82DB;
+    text-transform: uppercase;
+    color: #EDF5FF;
+}
+
+.registrations-panel{
+    width: 90%;
+    margin-top: 40px;
+    margin-left: 50px;
+}
+
+.registration-table td{
+    padding: 10px;
+}
+
+.registration-table input{
+    width: 800px;
+    height: 100px;
+    font-size: 18px;
+    border: 1px solid #083de1;
+    word-wrap: break-word;
+    padding: 12px 20px;
+}
+
+.registration-table button{
+    border: none;
+    border-radius: 3px;
+    height: 37px;
+    width: 180px;
+    font-size: 14px;
+    background: #3D82DB;
+    text-transform: uppercase;
+    color: #EDF5FF;
+}
+
+.popup-reg{
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(12, 20, 98, 0.8);
+    display: none;
+}
+
+.popup{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    background: #6897D4;
+    padding: 20px;
+    transform: translate(-50%, -50%);
+    padding-top: 60px;
+}
+
+.close-popup{
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+
+.reg-past-emp-body{
+    width: 99%;
+    background: #EDF5FF;
+}
+
+.reception-data-info{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    width: 99%;
+    height: 50%;
+    border: 1px solid #6897D4;
+}
+
+.reception-div-info{
+    width: 99%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+}
+
+.reception-div-info a{
+    margin: 15px;
+}
+
+.reception-div-info label{
+    margin: 15px;
+}
+
+.reception-div-info select{
+    margin: 15px;
+    height: 30px;
+    border: none;
+    border-radius: 10px;
+    width: 100px;
+}
+
+.reception-div-info button{
+    border: none;
+    border-radius: 3px;
+    height: 27px;
+    width: 200px;
+    font-size: 14px;
+    background: #3D82DB;
+    text-transform: uppercase;
+    color: #EDF5FF;
+}
+
+.create-line-vert{
+    margin: 15px;
+    height: 25px;
+    border-left: 3px solid #32a1ce;
+}
+
+.medref-data-info{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 30px;
+    width: 99%;
+    border: 1px solid #6897D4;
+}
+
+.medref-div-info{
+    margin: 20px;
+}
+
+.medref-div-info label{
+    margin-right: 10px;
+}
+
+.medref-div-info label{
+    width: 600px;
+    padding: 20px;
+    box-sizing: border-box;
+    border: #3D82DB;
+}

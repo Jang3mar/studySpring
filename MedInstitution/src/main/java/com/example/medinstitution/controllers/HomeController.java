@@ -3,6 +3,8 @@ package com.example.medinstitution.controllers;
 import com.example.medinstitution.models.*;
 import com.example.medinstitution.models.plugs.EmpPositionForDoctorInfo;
 import com.example.medinstitution.models.plugs.EmpPositionInfo;
+import com.example.medinstitution.models.plugs.Registation_Info;
+import com.example.medinstitution.models.views.read_all_registrations;
 import com.example.medinstitution.utilities.APIInterface;
 import com.example.medinstitution.utilities.RequestBuilder;
 import jakarta.servlet.http.Cookie;
@@ -34,6 +36,9 @@ public class HomeController {
         return "RegistrationWin";
     }
 
+//    @GetMapping("/SysAdminMenu")
+//    public String getSysAdmin() {return "SysAdminMenu";}
+
     @GetMapping("/ReceptionWinList")
     public String getReceptionList() {
         return "ReceptionWinList";
@@ -43,38 +48,29 @@ public class HomeController {
     public String getPatientMenu(Model model, @RequestParam(value = "typesFilter", required = false) String types){
         try{
             APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
-            List<DepartmentMed> depMed = api.getListDepartment().execute().body();
-            model.addAttribute("listDepartment", depMed);
-            List<Registration> PE = api.getRegistrarions().execute().body();
-            Logger.getAnonymousLogger().info(PE.size() + "");
-            List<EmpPositionInfo> epInfo = new ArrayList<>();
-            List<Position_Employee> posit = api.getListPosEmp().execute().body();
-            for (Registration reg: PE) {
-                epInfo.add(new EmpPositionInfo(
-                        reg.getID_Emp_Reg(),
-                        reg.getDate_Reg()+" "+reg.getTime_Reg(),
-                        posit.stream().filter(positionEmployee -> positionEmployee.getID_Emp_Pos().getID_Employee() == reg.getID_Emp_Reg().getID_Employee()).toList()
-                ));
-            }
+            List<read_all_registrations> readAllRegs = api.readAllRegistrations().execute().body();
+            Logger.getAnonymousLogger().info(readAllRegs.size()+"");
+            Logger.getAnonymousLogger().info(readAllRegs.get(0).getId_patient().toString());
+            readAllRegs = readAllRegs.stream().filter(readAllRegistrations -> readAllRegistrations.getId_patient() == 0).toList();
             Logger.getAnonymousLogger().info(types);
             if(types != null && !types.isEmpty()){
                 Logger.getAnonymousLogger().info("Im here");
                 types = types.substring(0, types.length()-1);
                 String[] typeArr = types.split(",");
-                List<EmpPositionInfo> resList = new ArrayList<>();
+                List<read_all_registrations> resList = new ArrayList<>();
                 Logger.getAnonymousLogger().info(typeArr[0]);
-                for (EmpPositionInfo info: epInfo) {
+                for (read_all_registrations info: readAllRegs) {
                     for(int i = 0; i< typeArr.length;i++){
-                        if(info.empPositions.toLowerCase().contains(typeArr[i].toLowerCase())){
+                        if(info.getPositions().toLowerCase().contains(typeArr[i].toLowerCase())){
                             resList.add(info);
                             break;
                         }
                     }
                 }
-                epInfo = resList;
+                readAllRegs = resList;
             }
-            model.addAttribute("regs", epInfo);
-            Logger.getAnonymousLogger().info(epInfo.size()+"");
+            model.addAttribute("regs", readAllRegs);
+            Logger.getAnonymousLogger().info(readAllRegs.size()+"");
         }
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());};
         return "PatientMenu";
@@ -89,9 +85,9 @@ public class HomeController {
             List<Position_Employee> posit = api.getListPosEmp().execute().body();
             for (Registration reg: PE) {
                 epInfo.add(new EmpPositionInfo(
-                        reg.getID_Emp_Reg(),
+                        reg.getID_Employee(),
                         reg.getDate_Reg()+" "+reg.getTime_Reg(),
-                        posit.stream().filter(positionEmployee -> positionEmployee.getID_Emp_Pos().getID_Employee() == reg.getID_Emp_Reg().getID_Employee()).toList()
+                        posit.stream().filter(positionEmployee -> positionEmployee.getID_Emp_Pos().getID_Employee() == reg.getID_Employee().getID_Employee()).toList()
                         ));
             }
             epInfo = epInfo.stream().filter(empPositionInfo -> {
@@ -133,14 +129,19 @@ public class HomeController {
         return "redirect:/PrivateRoom";
     }
 
+    @GetMapping("/RegistrationsList")
+    private String getRegistrationsList(){
+        return "RegistrationsList";
+    }
+
     @GetMapping("/EmployeeMenu")
     public String getEmployeeMenu(Model model, @CookieValue("userId") String id) throws IOException {
         APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
         List<Registration> registrations = api.getListRegistrarions().execute().body();
-        registrations = registrations.stream().filter(reg -> reg.getID_Emp_Reg().getID_Employee() == Long.parseLong(id)).toList();
+        registrations = registrations.stream().filter(reg -> reg.getID_Employee().getID_Employee() == Long.parseLong(id)).toList();
         List<EmpPositionForDoctorInfo> allInfo = new ArrayList<>();
         for (Registration registration: registrations) {
-            EmpPositionForDoctorInfo info = new EmpPositionForDoctorInfo(registration.getID_Pat_Reg(),registration.getDate_Reg(),registration.getTime_Reg());
+            EmpPositionForDoctorInfo info = new EmpPositionForDoctorInfo(registration.getID_Patient(),registration.getDate_Reg(),registration.getTime_Reg());
             allInfo.add(info);
         }
         if(allInfo.isEmpty()){
@@ -149,6 +150,15 @@ public class HomeController {
         model.addAttribute("registrations", allInfo);
         return "EmployeeMenu";
     }
+
+    @GetMapping("/ReceptionPastEmp")
+    private String getReceptionPastEmp(){return "ReceptionPastEmp";}
+
+    @GetMapping("/ReceptionPatWin")
+    private String getRecpetionPatWin() {return "ReceptionPatWin";}
+
+    @GetMapping("/PatientRecInfo")
+    private String getPatientRecInfo() {return "PatientRecInfo";}
 
     @GetMapping("/AdminPanel")
     public String getAdmin() {
@@ -244,9 +254,39 @@ public class HomeController {
     }
 
     @GetMapping("/AdminPanel/modelsWin/EmployeeWin")
-    public String getEmployee() {
+    public String getEmployee(Model model) {
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            Call<List<Employee>> listEmployee = api.getListEmployee();
+            Response<List<Employee>> res = listEmployee.execute();
+//            Logger.getAnonymousLogger().info(res.body().get(0).getDepartment_Name());
+            model.addAttribute("employeeList", res.body());
+        } catch (Exception e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
         return "modelsWin/EmployeeWin";
     }
+    @PostMapping("/AdminPanel/modelsWin/EmployeeWin")
+    public String addEmployee(Model model, @RequestParam(name = "Second_Employee") String Second_Employee,
+                              @RequestParam(name = "First_Employee") String First_Employee,
+                              @RequestParam(name = "Middle_Employee") String Middle_Employee,
+                              @RequestParam(name = "Birthday_Employee") String Birthday_Employee,
+                              @RequestParam(name = "Login_Employee") String Login_Employee,
+                              @RequestParam(name = "Password_Employee") String Password_Employee) {
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+//            Logger.getAnonymousLogger().info(positionName);
+            Call<Employee> newEmployee = api.addEmployee(new Employee(0l, Second_Employee, First_Employee, Middle_Employee, Birthday_Employee, Login_Employee, Password_Employee));
+            newEmployee.execute();
+            Call<List<Employee>> listEmployee = api.getListEmployee();
+            Response<List<Employee>> res = listEmployee.execute();
+//            Logger.getAnonymousLogger().info(res.body().get(0).getPosition_Name());
+            model.addAttribute("employeeList", res.body());
+        }
+        catch (Exception e){
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return "modelsWin/EmployeeWin";}
 
     @GetMapping("/AdminPanel/modelsWin/EmployeeDepWin")
     public String getEmployeeDep() {
@@ -368,10 +408,13 @@ public class HomeController {
                 String regDate = birthdayPatient.getDayOfMonth()+"."+ birthdayPatient.getMonthValue() + "." + birthdayPatient.getYear() ;
                 APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
                 Call<Patient> newPatient = api.registerPatient(new Patient(0l, secondName, firstName, middleName, loginPatient, passwordPatient, regDate));
-                newPatient.execute();
-                Call<List<Patient>> listPatient = api.getListPatient();
-                Response<List<Patient>> res = listPatient.execute();
-                model.addAttribute("patientList", res.body());
+                if (newPatient.execute().isSuccessful()){
+                    return "redirect:/";
+                }
+//                Call<List<Patient>> listPatient = api.getListPatient();
+//
+//                Response<List<Patient>> res = listPatient.execute();
+//                model.addAttribute("patientList", res.body());
             }
         }
         catch (Exception e ) {Logger.getAnonymousLogger().info(e.getMessage());}
@@ -489,6 +532,8 @@ public class HomeController {
                     returnPage = "redirect:PatientMenu";
                 } else if (type.equals("E")) {
                     returnPage = "redirect:EmployeeMenu";
+                } else if (type.equals("S")){
+                    returnPage = "redirect:SysAdminMenu";
                 }
                 else{
                     returnPage = "redirect:AdminPanel";
@@ -507,5 +552,38 @@ public class HomeController {
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
         Logger.getAnonymousLogger().info(returnPage);
         return returnPage;
+    }
+
+    @GetMapping("/addBackup")
+    public String getBackup(){
+        APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+        return "";
+    }
+
+    @GetMapping("/SysAdminMenu")
+    public String getLoggers(Model model){
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            Call<List<Loggers>> listLog = api.getLoggers();
+            Response<List<Loggers>> res = listLog.execute();
+            Logger.getAnonymousLogger().info(res.body().get(0).getDate_Log());
+            model.addAttribute("logs", res.body());
+        } catch (Exception e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return "SysAdminMenu";
+    }
+
+    @PostMapping("/patientRegistrationsAdd")
+    public String updateRegistration(Model model, @RequestParam("idReg") int idReg, @CookieValue("userId") String cookieId){
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+                Registration reg = new Registration();
+                //Logger.getAnonymousLogger().info(reg.getID_Emp_Reg().getID_Employee().toString());
+                Call<Registration> updateExec = api.updateRegistration(Long.valueOf(idReg), Long.parseLong(cookieId));
+                updateExec.execute();
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return "redirect:/PatientMenu";
     }
 }

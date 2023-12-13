@@ -3,11 +3,30 @@ package com.example.medapi.controllers;
 import com.example.medapi.DAO.AllDAO;
 import com.example.medapi.Models.*;
 import com.example.medapi.Models.plugs.*;
+import com.example.medapi.Models.views.read_all_registrations;
+import com.example.medapi.modifies.BackupBase;
+import com.example.medapi.modifies.Crypto;
+import com.mysql.cj.log.Log;
+import org.apache.tomcat.util.bcel.Const;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.KeySpec;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -218,6 +237,7 @@ public class HomeController {
     @ResponseBody
     public Employee returnEmployee(@PathVariable("id") Long id){
         List<Employee> employeeList = returnEmployee();
+        Logger.getAnonymousLogger().info("Here: " + employeeList.size());
         return employeeList.stream().filter(employee -> employee.getID_Employee() == id).findAny().orElse(null);
     }
 
@@ -269,17 +289,26 @@ public class HomeController {
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
         return patientList;
     }
-
+//нихуя не поняла
     @GetMapping("/getPatient/{id}")
     @ResponseBody
     public Patient returnPatient(@PathVariable("id") Long id){
-        List<Patient> patientList = returnPatient();
-        return patientList.stream().filter(patient -> patient.getID_Patient() == id).findAny().orElse(null);
+        try {
+            List<Patient> patientList = returnPatient();
+            Patient pat = patientList.stream().filter(patient -> patient.getID_Patient() == id).findAny().orElse(null);
+            //pat.setLogin_Patient(reverseHashString(pat.getLogin_Patient()));
+            //pat.setPassword_Patient(reverseHashString(pat.getPassword_Patient()));
+            return pat;
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return null;
     }
 
     @PostMapping(value = "/registerPatient")
     public Patient registerPatient(@RequestBody Patient patient){
         try{
+            //patient.setLogin_Patient(hashString(patient.getLogin_Patient()));
+            //patient.setPassword_Patient(hashString(patient.getPassword_Patient()));
             allDAO.addToTable("Patient", patient);
             return new Patient();
         }
@@ -793,7 +822,7 @@ public class HomeController {
                 medicalCardList.add(medCard);
             }
         }
-        catch (SQLException e) {
+        catch (Exception e) {
             Logger.getAnonymousLogger().info(e.getMessage());
         }
         return medicalCardList;
@@ -947,6 +976,7 @@ public class HomeController {
         }
         return registrationList;
     }
+
     @GetMapping(value = "/getRegistration")
     @ResponseBody
     public List<Registration> getRegistration(){
@@ -956,36 +986,110 @@ public class HomeController {
             Registration registration = new Registration();
             if(res != null)
                 while (res.next()) {
-                    Patient pt = returnPatient(res.getLong(5));
-                    registration = new Registration(res.getLong(1), res.getString(2),res.getString(3), res.getString(4), returnEmployee(res.getLong(5)),pt);
+                    Patient pt = returnPatient(res.getLong(6));
+                    Employee emp = returnEmployee(res.getLong(5));
+                    Logger.getAnonymousLogger().info(res.getLong(5) + "");
+                    registration = new Registration(res.getLong(1), res.getString(2),res.getString(3), res.getString(4), emp,pt);
                     registrationList.add(registration);
                 }
         }
-        catch (SQLException e) {
+        catch (Exception e) {
             Logger.getAnonymousLogger().info(e.getMessage());
         }
         return registrationList;
     }
 
+    @GetMapping(value = "/getRegistration/{id}")
+    @ResponseBody
+    public Registration returnRegistrationId(@PathVariable("id") Long id){
+        List<Registration> registrationList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Registration", Registration.class);
+        try{
+            Registration registration = new Registration();
+            while (res.next()){
+                Patient patient = returnPatient(res.getLong(6));
+                Employee employee = returnEmployee(res.getLong(5));
+//                Logger.getAnonymousLogger().info(id + "");
+                Logger.getAnonymousLogger().info(employee.getID_Employee() + " AAAAAAAAAAA");
+                registration = new Registration(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), employee, patient);
+                registrationList.add(registration);
+            }
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        Logger.getAnonymousLogger().info(registrationList.size() + "");
+        Logger.getAnonymousLogger().info(registrationList.stream().filter(registration -> registration.getID_Registration() == id).findAny().orElse(null).getID_Registration() + " AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        return registrationList.stream().filter(registration -> registration.getID_Registration() == id).findAny().orElse(null);
+    }
+
+    @PostMapping("/updateRegistration/{id}")
+    public Registration updateRegistration(@PathVariable("id") Long id, @RequestParam("idUser") Long idUser){
+        try{
+            Registration regs = returnRegistrationId(id);
+            Registration_Info registrationInfo = new Registration_Info(regs.getID_Registration(), regs.getDate_Reg(), regs.getTime_Reg(), regs.getDes_Symptoms(), regs.getID_Employee().getID_Employee(), idUser);
+            allDAO.updateToTable("Registration", registrationInfo, registrationInfo.getID_Registration());
+            return new Registration();
+        }
+        catch (Exception e){Logger.getAnonymousLogger().info(e.getMessage());}
+        return null;
+    }
+
+    @GetMapping("/getAllRegistrationsView")
+    public List<read_all_registrations> readAllRegistrations(){
+        List<read_all_registrations> readRegs = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("read_all_registrations", read_all_registrations.class);
+        try {
+            read_all_registrations read_all_registrations = new read_all_registrations();
+            if(res != null)
+                while (res.next()) {
+                    read_all_registrations = new read_all_registrations(res.getLong(1), res.getLong(2), res.getLong(3), res.getString(4), res.getString(5), res.getString(6), res.getString(7), res.getString(8), res.getString(9), res.getString(10));
+                    readRegs.add(read_all_registrations);
+                }
+        }
+        catch (Exception e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return readRegs;
+    }
+
     @GetMapping("/getLogIn")
-    public Map<String, Object> returnLogIn(@RequestParam("login") String login, @RequestParam("password") String password){
+    public Map<String, Object> returnLogIn(@RequestParam("login") String login, @RequestParam("password") String password) throws Exception {
+
+        //String newLogin = hashString(login);
+        //String newPassword = hashString(password);
         List<Patient> patientList = returnPatient();
         Logger.getAnonymousLogger().info(login);
         Logger.getAnonymousLogger().info(password);
         Map<String, Object> map = new HashMap<>();
-        Patient pat = patientList.stream().filter(patient -> patient.getLogin_Patient().equals(login) && patient.getPassword_Patient().equals(password)).findAny().orElse(null);
+        Patient pat = patientList.stream().filter(patient -> {
+            try {
+                return Crypto.decrypt(patient.getLogin_Patient()).equals(login) && Crypto.decrypt(patient.getPassword_Patient()).equals(password);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).findAny().orElse(null);
         if (pat != null){
             map.put("type", "P");
             map.put("id", pat.getID_Patient());
         }
         List<Employee> employeeList = returnEmployee();
         //Logger.getAnonymousLogger().info(employeeList.get(0).getSecond_Employee());
-        Employee emp = employeeList.stream().filter(employee -> employee.getLogin_Employee().equals(login) && employee.getPassword_Employee().equals(password)).findAny().orElse(null);
+        Employee emp = employeeList.stream().filter(employee -> {
+            try {
+                return Crypto.decrypt(employee.getLogin_Employee()).equals(login) && Crypto.decrypt(employee.getPassword_Employee()).equals(password);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).findAny().orElse(null);
         if(emp != null){
             List<Position_Employee> posEmp = returnPosEmployee().stream().filter(emp1 -> emp1.getID_Employee().getID_Employee() == emp.getID_Employee()).toList();
             for (Position_Employee item: posEmp) {
                 if(item.getID_Position().getPosition_Name().equals("Админ")){
                     map.put("type", "A");
+                    map.put("id", emp.getID_Employee());
+                    return map;
+                }
+                else if (item.getID_Position().getPosition_Name().equals("Системный администратор")){
+                    map.put("type", "S");
                     map.put("id", emp.getID_Employee());
                     return map;
                 }
@@ -996,6 +1100,32 @@ public class HomeController {
         return map;
     }
 
+    @GetMapping("/AdminPanel/addBackup")
+    public ResponseEntity<String> getBackup(){
+        try {
+            BackupBase backupBase = new BackupBase();
+            backupBase.createBackup("3306", "8081", "medInst", "root", "", "/path/to/backup.sql");
+            return ResponseEntity.ok("Backup initiated successfully");
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error initiating backup");
+    }
 
+    @GetMapping("/SysAdminMenu")
+    public List<Loggers> returnLoggers(){
+        List<Loggers> loggersList = new ArrayList<>();
+        ResultSet res = allDAO.selectToTable("Loggers", Loggers.class);
+        try {
+            Loggers log = new Loggers();
+            while (res.next()) {
+                log = new Loggers(res.getLong(1), res.getString(2), res.getString(3));
+                loggersList.add(log);
+            }
+        }
+        catch (Exception e) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+        }
+        return loggersList;
+    }
 
 }

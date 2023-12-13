@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Детали приема</title>
+    <link rel="stylesheet" href="../static/styles.css" th:href="@{/styles.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body class="emp-rec-body">
+<header class="employee-header">
+    <form method="get" action="/EmployeeMenu">
+        <div class="button-styles">
+            <button>Назад</button>
+        </div>
+    </form>
+</header>
+<div>
+    <form>
+        <div class="reception-data-info">
+            <div class="reception-div-info">
+                <label>Дата:</label>
+                <a>Дата</a>
+                <div class="create-line-vert"></div>
+                <label>Время:</label>
+                <a>Время</a>
+            </div>
+            <div class="reception-div-info">
+                <form method="get" action="/PatientRecInfo">
+                    <button>Пациент</button>
+                </form>
+            </div>
+            <div class="reception-div-info">
+                <label>Статус:</label>
+                <a>Статус</a>
+                <div class="create-line-vert"></div>
+                <label>Диагноз:</label>
+                <select>
+                    <option>Диагноз</option>
+                </select>
+            </div>
+        </div>
+    </form>
+    <form>
+        <div class="medref-data-info">
+            <div class="medref-div-info">
+                <label>Назначение</label>
+                <input type="text" placeholder="Назначение">
+            </div>
+            <div class="medref-div-info">
+                <label>Описание</label>
+                <input type="text" placeholder="Описание">
+            </div>
+            <div class="medref-div-info">
+                <label>Доп информация</label>
+                <input type="text" placeholder="Дополнительная информация">
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

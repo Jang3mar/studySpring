@@ -29,11 +29,11 @@ public class Registration {
 
     public Registration() {}
 
-    public Registration(Long ID_Registration, String date_Reg, String time_Reg, String DesSymptoms, Employee ID_Emp_Reg, Patient ID_Pat_Reg) {
+    public Registration(Long ID_Registration, String date_Reg, String time_Reg, String Des_Symptoms, Employee ID_Emp_Reg, Patient ID_Pat_Reg) {
         this.ID_Registration = ID_Registration;
         Date_Reg = date_Reg;
         Time_Reg = time_Reg;
-        Des_Symptoms = DesSymptoms;
+        this.Des_Symptoms = Des_Symptoms;
         this.ID_Employee = ID_Emp_Reg;
         this.ID_Patient = ID_Pat_Reg;
     }
@@ -62,28 +62,12 @@ public class Registration {
         Time_Reg = time_Reg;
     }
 
-    public Employee getID_Emp_Reg() {
-        return ID_Employee;
-    }
-
-    public void setID_Emp_Reg(Employee ID_Emp_Reg) {
-        this.ID_Employee = ID_Emp_Reg;
-    }
-
-    public Patient getID_Pat_Reg() {
-        return ID_Patient;
-    }
-
-    public void setID_Pat_Reg(Patient ID_Pat_Reg) {
-        this.ID_Patient = ID_Pat_Reg;
-    }
-
-    public String getDesSymptoms() {
+    public String getDes_Symptoms() {
         return Des_Symptoms;
     }
 
-    public void setDesSymptoms(String desSymptoms) {
-        Des_Symptoms = desSymptoms;
+    public void setDes_Symptoms(String des_Symptoms) {
+        Des_Symptoms = des_Symptoms;
     }
 
     public Employee getID_Employee() {

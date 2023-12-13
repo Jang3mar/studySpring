@@ -17,7 +17,7 @@
     <form method="get" action="/ReceptionWinList">
         <button>Приемы</button>
     </form>
-    <form>
+    <form method="get" action="/RegistrationsList">
         <button>Запись</button>
     </form>
     </div>
@@ -38,10 +38,11 @@
             <div class="patient-table-main">
                 <table>
                     <tr th:each="item : ${regs}">
-                        <form method="post">
-                            <td><a th:text="${item.empFIO}"></a></td>
-                            <td><a th:text="${item.empPositions}"></a></td>
-                            <td><a th:text="${item.dateTimeRegistrarion}"></a></td>
+                        <form method="post" action="/patientRegistrationsAdd">
+                            <td hidden><input th:value="${item.id_registration}" name="idReg"></td>
+                            <td><a th:text="${item.second_employee + ' ' + item.first_employee + ' ' + item.middle_employee}"></a></td>
+                            <td><a th:text="${item.positions}"></a></td>
+                            <td><a th:text="${item.date_reg + ' ' + item.time_reg}"></a></td>
                             <td><button>Записаться</button></td>
                         </form>
                     </tr>

@@ -10,11 +10,14 @@ import java.io.IOException;
 import java.util.List;
 
 public class EmpPositionInfo {
+
+    public Long empId;
     public String empFIO;
     public String empPositions;
     public String dateTimeRegistrarion;
 
     public EmpPositionInfo(Employee employee, String dateTimeRegistrarion, List<Position_Employee> empPos) throws IOException {
+        empId = employee.getID_Employee();
         empFIO = employee.getSecond_Employee()+" "+employee.getFirst_Employee()+" "+employee.getMiddle_Employee();
         empPositions = "";
         for (Position_Employee pe: empPos) {

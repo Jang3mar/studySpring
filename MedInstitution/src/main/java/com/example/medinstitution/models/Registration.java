@@ -16,11 +16,11 @@ public class Registration {
     @SerializedName(value = "des_Symptoms")
     private String Des_Symptoms;
 
-    @SerializedName(value = "id_Emp_Reg")
-    private Employee ID_Emp_Reg;
+    @SerializedName(value = "ID_Employee")
+    private Employee ID_Employee;
 
-    @SerializedName(value = "id_Pat_Reg")
-    private Patient ID_Pat_Reg;
+    @SerializedName(value = "ID_Patient")
+    private Patient ID_Patient;
 
     public Registration() {}
 
@@ -29,8 +29,8 @@ public class Registration {
         Date_Reg = date_Reg;
         Time_Reg = time_Reg;
         Des_Symptoms = DesSymptoms;
-        this.ID_Emp_Reg = ID_Emp_Reg;
-        this.ID_Pat_Reg = ID_Pat_Reg;
+        this.ID_Employee = ID_Emp_Reg;
+        this.ID_Patient = ID_Pat_Reg;
     }
 
     public Long getID_Registration() {
@@ -57,27 +57,27 @@ public class Registration {
         Time_Reg = time_Reg;
     }
 
-    public Employee getID_Emp_Reg() {
-        return ID_Emp_Reg;
+    public Employee getID_Employee() {
+        return ID_Employee;
     }
 
-    public void setID_Emp_Reg(Employee ID_Emp_Reg) {
-        this.ID_Emp_Reg = ID_Emp_Reg;
+    public void setID_Employee(Employee ID_Employee) {
+        this.ID_Employee = ID_Employee;
     }
 
-    public Patient getID_Pat_Reg() {
-        return ID_Pat_Reg;
+    public Patient getID_Patient() {
+        return ID_Patient;
     }
 
-    public void setID_Pat_Reg(Patient ID_Pat_Reg) {
-        this.ID_Pat_Reg = ID_Pat_Reg;
+    public void setID_Patient(Patient ID_Patient) {
+        this.ID_Patient = ID_Patient;
     }
 
-    public String getDesSymptoms() {
+    public String getDes_Symptoms() {
         return Des_Symptoms;
     }
 
-    public void setDesSymptoms(String desSymptoms) {
+    public void setDes_Symptoms(String desSymptoms) {
         Des_Symptoms = desSymptoms;
     }
 }

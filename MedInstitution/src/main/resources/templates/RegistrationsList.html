@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Записи</title>
+    <link rel="stylesheet" href="../static/styles.css" th:href="@{/styles.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&family=Poppins&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="header-private">
+    <form method="get" action="/PatientMenu">
+        <div class="button-styles">
+            <button>Назад</button>
+        </div>
+    </form>
+    <form>
+        <div class="patient-button-styles">
+            <button>Личный кабинет</button>
+        </div>
+    </form>
+</header>
+</body>
+<div class="registrations-panel">
+    <form>
+        <table class="registration-table">
+            <tr>
+                <form>
+                    <td><a>Дата</a></td>
+                    <td><a>Время</a></td>
+                    <td><a>Врач</a></td>
+                    <td><input type="text"></td>
+                    <td><button>Сохранить</button></td>
+                    <td><button>Отменить запись</button></td>
+                </form>
+            </tr>
+        </table>
+    </form>
+</div>
+</html>
