@@ -4,29 +4,29 @@ import com.google.gson.annotations.SerializedName;
 
 public class Loggers {
 
-    @SerializedName(value = "idLog")
-    private Long ID_Log;
+    @SerializedName(value = "id_log")
+    private Long id_log;
 
-    @SerializedName(value = "logName")
+    @SerializedName(value = "log_name")
     private String log_Name;
 
-    @SerializedName(value = "dateLog")
-    private String date_Log;
+    @SerializedName(value = "datr_name")
+    private String date_name;
 
     public Loggers() {}
 
     public Loggers(Long ID_Log, String log_Name, String date_Log) {
-        this.ID_Log = ID_Log;
+        this.id_log = ID_Log;
         this.log_Name = log_Name;
-        this.date_Log = date_Log;
+        this.date_name = date_Log;
     }
 
     public Long getID_Log() {
-        return ID_Log;
+        return id_log;
     }
 
     public void setID_Log(Long ID_Log) {
-        this.ID_Log = ID_Log;
+        this.id_log = ID_Log;
     }
 
     public String getLog_Name() {
@@ -38,11 +38,11 @@ public class Loggers {
     }
 
     public String getDate_Log() {
-        return date_Log;
+        return date_name;
     }
 
     public void setDate_Log(String date_Log) {
-        this.date_Log = date_Log;
+        this.date_name = date_Log;
     }
 
     //какие то еще данные нужны? время может? надо бы время тоже добавлять

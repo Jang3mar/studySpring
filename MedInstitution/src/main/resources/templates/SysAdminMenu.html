@@ -25,9 +25,8 @@
     <table>
         <tr th:each="item : ${logs}">
             <form method="get" action="/SysAdminMenu">
-                <td><a th:text="${item.getID_Log()}">id</a></td>
-                <td><a th:text="${item.getDate_Log()}">время</a></td>
-                <td><a th:text="${item.getLog_Name()}">описание</a></td>
+                <td><a th:text="${item.date_Log}">время</a></td>
+                <td><a th:text="${item.log_Name}">описание</a></td>
             </form>
         </tr>
     </table>

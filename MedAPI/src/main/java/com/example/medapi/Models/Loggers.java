@@ -10,10 +10,10 @@ public class Loggers {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id_Log;
 
-    @Column(name = "log_Name", nullable = false)
+    @Column(name = "log_name", nullable = false)
     private String log_Name;
 
-    @Column(name = "date_Name", nullable = false)
+    @Column(name = "date_name", nullable = false)
     private String date_Name;
 
     public Loggers() {}

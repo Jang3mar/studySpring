@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -297,9 +298,12 @@ public class HomeController {
     public Patient returnPatient(@PathVariable("id") Long id){
         try {
             List<Patient> patientList = returnPatient();
-            Patient pat = patientList.stream().filter(patient -> patient.getID_Patient() == id).findAny().orElse(null);
+            Patient pat = patientList.stream().filter(patient -> patient.getID_Patient() ==
+                    id).findAny().orElse(null);
             //pat.setLogin_Patient(reverseHashString(pat.getLogin_Patient()));
             //pat.setPassword_Patient(reverseHashString(pat.getPassword_Patient()));
+
+            //для получения информации о пользователе расшифровываем логин и перезаписываем его
             pat.setLogin_Patient(Crypto.decrypt(pat.getLogin_Patient()));
             return pat;
         }
@@ -307,7 +311,7 @@ public class HomeController {
         return null;
     }
 
-    @PostMapping(value = "/registerPatient")
+    @PostMapping(value = "/Ы")
     public Patient registerPatient(@RequestBody Patient patient){
         try{
             //patient.setLogin_Patient(hashString(patient.getLogin_Patient()));
@@ -1096,71 +1100,80 @@ public class HomeController {
     }
 
     @GetMapping("/getLogIn")
-    public Map<String, Object> returnLogIn(@RequestParam("login") String login, @RequestParam("password") String password) throws Exception {
+    public Map<String, Object> returnLogIn(@RequestParam("login") String login,
+                                           @RequestParam("password") String password) {
 
         //String newLogin = hashString(login);
         //String newPassword = hashString(password);
-        List<Patient> patientList = returnPatient();
-        Logger.getAnonymousLogger().info(login);
-        Logger.getAnonymousLogger().info(password);
-        Map<String, Object> map = new HashMap<>();
-        Patient pat = patientList.stream().filter(patient -> {
-            try {
-                return Crypto.decrypt(patient.getLogin_Patient()).equals(login) && Crypto.decrypt(patient.getPassword_Patient()).equals(password);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }).findAny().orElse(null);
-        if (pat != null){
-            map.put("type", "P");
-            map.put("id", pat.getID_Patient());
-        }
-        List<Employee> employeeList = returnEmployee();
-        //Logger.getAnonymousLogger().info(employeeList.get(0).getSecond_Employee());
-        Employee emp = employeeList.stream().filter(employee -> {
-            try {
-                return Crypto.decrypt(employee.getLogin_Employee()).equals(login) && Crypto.decrypt(employee.getPassword_Employee()).equals(password);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }).findAny().orElse(null);
-        if(emp != null){
-            List<Position_Employee> posEmp = returnPosEmployee().stream().filter(emp1 -> emp1.getID_Employee().getID_Employee() == emp.getID_Employee()).toList();
-            for (Position_Employee item: posEmp) {
-                if(item.getID_Position().getPosition_Name().equals("Админ")){
-                    map.put("type", "A");
-                    map.put("id", emp.getID_Employee());
-                    return map;
-                }
-                else if (item.getID_Position().getPosition_Name().equals("Системный администратор")){
-                    map.put("type", "S");
-                    map.put("id", emp.getID_Employee());
-                    return map;
-                }
-            }
-            map.put("type", "E");
-            map.put("id", emp.getID_Employee());
-        }
-        String enteranceString = "";
-        if(map.containsKey("type")){
-            enteranceString = map.get("type").equals("P") ? "Вход пациента с id - ": "Вход сотрудника с id - ";
-            enteranceString += map.get("id");
-            allDAO.noLogAdd("Loggers",new Loggers(0l,enteranceString, LocalDateTime.now().toLocalDate().toString()));
-        }
-
-        return map;
-    }
-
-    @GetMapping("/AdminPanel/addBackup")
-    public ResponseEntity<String> getBackup(){
         try {
-            BackupBase backupBase = new BackupBase();
-            backupBase.createBackup("3306", "8081", "medInst", "root", "", "/path/to/backup.sql");
-            return ResponseEntity.ok("Backup initiated successfully");
+
+            List<Patient> patientList = returnPatient();
+            Logger.getAnonymousLogger().info(login);
+            Logger.getAnonymousLogger().info(password);
+            Map<String, Object> map = new HashMap<>();
+            Patient patientNew = patientList.stream().filter(patient -> {
+                try {
+                    return Crypto.decrypt(patient.getLogin_Patient()).equals(login) &&
+                            Crypto.decrypt(patient.getPassword_Patient()).equals(password);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }).findAny().orElse(null);
+            if (patientNew != null) {
+                map.put("type", "P");
+                map.put("id", patientNew.getID_Patient());
+            }
+            List<Employee> employeeList = returnEmployee();
+            //Logger.getAnonymousLogger().info(employeeList.get(0).getSecond_Employee());
+            Employee emp = employeeList.stream().filter(employee -> {
+                try {
+                    return Crypto.decrypt(employee.getLogin_Employee()).equals(login) &&
+                            Crypto.decrypt(employee.getPassword_Employee()).equals(password);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }).findAny().orElse(null);
+            if (emp != null) {
+                List<Position_Employee> posEmp = returnPosEmployee().stream().filter(emp1 -> emp1.getID_Employee().getID_Employee() == emp.getID_Employee()).toList();
+                for (Position_Employee item : posEmp) {
+                    if (item.getID_Position().getPosition_Name().equals("Админ")) {
+                        map.put("type", "A");
+                        map.put("id", emp.getID_Employee());
+                        return map;
+                    } else if (item.getID_Position().getPosition_Name().equals("Системный администратор")) {
+                        map.put("type", "S");
+                        map.put("id", emp.getID_Employee());
+                        return map;
+                    }
+                }
+                map.put("type", "E");
+                map.put("id", emp.getID_Employee());
+            }
+            String enteranceString = "";
+            if (map.containsKey("type")) {
+                enteranceString = map.get("type").equals("P") ? "Вход пациента с id - " : "Вход сотрудника с id - ";
+                enteranceString += map.get("id");
+                allDAO.noLogAdd("Loggers", new Loggers(0l,
+                        enteranceString,
+                        LocalDateTime.now().toLocalDate().toString())
+                );
+            }
+            return map;
         }
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error initiating backup");
+        return null;
     }
+
+//    @GetMapping("/AdminPanel/addBackup")
+//    public ResponseEntity<String> getBackup(){
+//        try {
+//            BackupBase backupBase = new BackupBase();
+//            backupBase.createBackup("3306", "8081", "medInst", "root", "", "/path/to/backup.sql");
+//            return ResponseEntity.ok("Backup initiated successfully");
+//        }
+//        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error initiating backup");
+//    }
 
     @GetMapping("/SysAdminMenu")
     public List<Loggers> returnLoggers(){
@@ -1169,7 +1182,9 @@ public class HomeController {
         try {
             Loggers log = new Loggers();
             while (res.next()) {
-                log = new Loggers(res.getLong(1), res.getString(2), res.getString(3));
+                log = new Loggers(res.getLong(1),
+                        res.getString(2),
+                        res.getString(3));
                 loggersList.add(log);
             }
         }
@@ -1178,5 +1193,6 @@ public class HomeController {
         }
         return loggersList;
     }
+
 
 }

@@ -169,20 +169,26 @@ public class HomeController {
     }
 
     @GetMapping("/EmployeeMenu")
-    public String getEmployeeMenu(Model model, @CookieValue("userId") String id) throws IOException {
-        APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
-        List<Registration> registrations = api.getListRegistrarions().execute().body();
-        registrations = registrations.stream().filter(reg -> reg.getID_Employee().getID_Employee() == Long.parseLong(id)).toList();
-        List<EmpPositionForDoctorInfo> allInfo = new ArrayList<>();
-        for (Registration registration: registrations) {
-            EmpPositionForDoctorInfo info = new EmpPositionForDoctorInfo(registration.getID_Patient(),registration.getDate_Reg(),registration.getTime_Reg());
-            allInfo.add(info);
+    public String getEmployeeMenu(Model model, @CookieValue("userId") String id) {
+        try {
+            APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+            List<Registration> registrations = api.getListRegistrarions().execute().body();
+            registrations = registrations.stream().filter(reg -> reg.getID_Employee().getID_Employee() == Long.parseLong(id)).toList();
+            List<EmpPositionForDoctorInfo> allInfo = new ArrayList<>();
+            for (Registration registration : registrations) {
+                EmpPositionForDoctorInfo info = new EmpPositionForDoctorInfo(registration.getID_Patient(), registration.getDate_Reg(), registration.getTime_Reg());
+                allInfo.add(info);
+            }
+            if (allInfo.isEmpty()) {
+                allInfo.add(new EmpPositionForDoctorInfo(null, "Нет записей.", ""));
+            }
+            model.addAttribute("registrations", allInfo);
+            return "EmployeeMenu";
         }
-        if(allInfo.isEmpty()){
-            allInfo.add(new EmpPositionForDoctorInfo(null, "Нет записей.",""));
+        catch (Exception e ) {
+            Logger.getAnonymousLogger().info(e.getMessage());
+            return "";
         }
-        model.addAttribute("registrations", allInfo);
-        return "EmployeeMenu";
     }
 
     @GetMapping("/ReceptionPastEmp")
@@ -601,6 +607,7 @@ public class HomeController {
             Call<List<Loggers>> listLog = api.getLoggers();
             Response<List<Loggers>> res = listLog.execute();
             Logger.getAnonymousLogger().info(res.body().get(0).getDate_Log());
+
             model.addAttribute("logs", res.body());
         } catch (Exception e) {
             Logger.getAnonymousLogger().info(e.getMessage());
