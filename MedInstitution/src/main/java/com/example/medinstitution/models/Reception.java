@@ -17,10 +17,10 @@ public class Reception {
     private String Status_Reception;
 
     @SerializedName(value = "id_Reg_Rec")
-    private Registration ID_Reg_Rec;
+    private Registration id_registration;
 
     @SerializedName(value = "id_Dig_Rec")
-    private Diagnosis ID_Dig_Rec;
+    private Diagnosis id_diagnosis;
 
     public Reception() {}
 
@@ -29,8 +29,8 @@ public class Reception {
         Date_Reception = date_Reception;
         Time_Reception = time_Reception;
         Status_Reception = status_Reception;
-        this.ID_Reg_Rec = ID_Reg_Rec;
-        this.ID_Dig_Rec = ID_Dig_Rec;
+        this.id_registration = ID_Reg_Rec;
+        this.id_diagnosis = ID_Dig_Rec;
     }
 
     public Long getID_Reception() {
@@ -65,19 +65,19 @@ public class Reception {
         Status_Reception = status_Reception;
     }
 
-    public Registration getID_Reg_Rec() {
-        return ID_Reg_Rec;
+    public Registration getId_registration() {
+        return id_registration;
     }
 
-    public void setID_Reg_Rec(Registration ID_Reg_Rec) {
-        this.ID_Reg_Rec = ID_Reg_Rec;
+    public void setId_registration(Registration id_registration) {
+        this.id_registration = id_registration;
     }
 
-    public Diagnosis getID_Dig_Rec() {
-        return ID_Dig_Rec;
+    public Diagnosis getId_diagnosis() {
+        return id_diagnosis;
     }
 
-    public void setID_Dig_Rec(Diagnosis ID_Dig_Rec) {
-        this.ID_Dig_Rec = ID_Dig_Rec;
+    public void setId_diagnosis(Diagnosis id_diagnosis) {
+        this.id_diagnosis = id_diagnosis;
     }
 }

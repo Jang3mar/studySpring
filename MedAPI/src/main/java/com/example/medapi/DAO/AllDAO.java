@@ -69,7 +69,7 @@ public class AllDAO {
                         id = resState.getLong(1) + 1l;
                     }
                     state.executeUpdate(query);
-                    String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toString() + "')";
+                    String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toLocalDate().toString() + "')";
                     state.executeUpdate(queryLog);
                 }
             }
@@ -170,7 +170,7 @@ public class AllDAO {
                         id = resState.getLong(1) + 1l;
                     }
                     state.executeUpdate(query);
-                    String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toString() + "')";
+                    String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toLocalDate().toString() + "')";
                     state.executeUpdate(queryLog);
                 }
             }
@@ -233,7 +233,7 @@ public class AllDAO {
                         id = resState.getLong(1) + 1l;
                     }
                     state.executeUpdate(query);
-                    String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toString() + "')";
+                    String queryLog = "INSERT INTO Loggers (id_Log, log_Name, date_Name) values (" + id + ", '" + query.replace('(', ' ').replace(')', ' ').replace(',', ' ').replace('\'', ' ') + "','" + LocalDateTime.now().toLocalDate().toString() + "')";
                     state.executeUpdate(queryLog);
                 }
             }

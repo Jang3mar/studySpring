@@ -16,10 +16,10 @@ public class Registration {
     @SerializedName(value = "des_Symptoms")
     private String Des_Symptoms;
 
-    @SerializedName(value = "ID_Employee")
+    @SerializedName(value = "id_Employee")
     private Employee ID_Employee;
 
-    @SerializedName(value = "ID_Patient")
+    @SerializedName(value = "id_Patient")
     private Patient ID_Patient;
 
     public Registration() {}

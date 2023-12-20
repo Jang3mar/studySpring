@@ -24,12 +24,12 @@ public class Loggers {
         this.date_Name = date_Name;
     }
 
-    public Long getID_Log() {
+    public Long getId_Log() {
         return id_Log;
     }
 
-    public void setID_Log(Long ID_Log) {
-        this.id_Log = ID_Log;
+    public void setId_Log(Long id_Log) {
+        this.id_Log = id_Log;
     }
 
     public String getLog_Name() {

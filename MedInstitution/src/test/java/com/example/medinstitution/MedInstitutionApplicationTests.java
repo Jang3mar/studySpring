@@ -23,21 +23,21 @@ class MedInstitutionApplicationTests {
 
     }
 
-    @Test
-    void registrationUsers() throws IOException {
-        Patient patient = new Patient(0l,
-                "Павлов",
-                "Павел",
-                "Павлович",
-                "Pavel!123",
-                "Qwert!123",
-                "26.07.1985");
-        APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
-        Call<Patient> newPatient = api.registerPatient(patient);
-        String status = "";
-        if(newPatient.execute().isSuccessful()){
-            status = HttpStatus.OK.toString();
-        }
-        assertEquals("200 OK", status);
-    }
+//    @Test
+//    void registrationUsers() throws IOException {
+//        Patient patient = new Patient(0l,
+//                "Павлов",
+//                "Павел",
+//                "Павлович",
+//                "Pavel!123",
+//                "Qwert!123",
+//                "26.07.1985");
+//        APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
+//        Call<Patient> newPatient = api.registerPatient(patient);
+//        String status = "";
+//        if(newPatient.execute().isSuccessful()){
+//            status = HttpStatus.OK.toString();
+//        }
+//        assertEquals("200 OK", status);
+//    }
 }

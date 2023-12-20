@@ -11,13 +11,23 @@ import com.example.medinstitution.utilities.RequestBuilder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.juli.logging.Log;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import retrofit2.Call;
 import retrofit2.Response;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -61,7 +71,7 @@ public class HomeController {
                     for(int i = 0; i< typeArr.length;i++){
                         if(info.getDepartments().toLowerCase().contains(typeArr[i].toLowerCase())){
                             resList.add(info);
-                            break;
+                            continue;
                         }
                     }
                 }
@@ -176,18 +186,18 @@ public class HomeController {
             registrations = registrations.stream().filter(reg -> reg.getID_Employee().getID_Employee() == Long.parseLong(id)).toList();
             List<EmpPositionForDoctorInfo> allInfo = new ArrayList<>();
             for (Registration registration : registrations) {
-                EmpPositionForDoctorInfo info = new EmpPositionForDoctorInfo(registration.getID_Patient(), registration.getDate_Reg(), registration.getTime_Reg());
+                EmpPositionForDoctorInfo info = new EmpPositionForDoctorInfo(registration.getID_Patient(), registration.getDate_Reg(), registration.getTime_Reg(), registration.getID_Registration());
                 allInfo.add(info);
             }
             if (allInfo.isEmpty()) {
-                allInfo.add(new EmpPositionForDoctorInfo(null, "Нет записей.", ""));
+                allInfo.add(new EmpPositionForDoctorInfo(null, "Нет записей.", "", 0l));
             }
             model.addAttribute("registrations", allInfo);
             return "EmployeeMenu";
         }
         catch (Exception e ) {
             Logger.getAnonymousLogger().info(e.getMessage());
-            return "";
+            return "/EmployeeMenu";
         }
     }
 
@@ -195,7 +205,28 @@ public class HomeController {
     private String getReceptionPastEmp(){return "ReceptionPastEmp";}
 
     @GetMapping("/ReceptionPatWin")
-    private String getRecpetionPatWin() {return "ReceptionPatWin";}
+    private String getRecpetionPatWin(@RequestParam("idReg") String idReg) {
+        try {
+            APIInterface apiInterface = RequestBuilder.buildRequest().create(APIInterface.class);
+            Call<List<Reception>> receptionList = apiInterface.getListReception();
+            List<Reception> recList = receptionList.execute().body();
+            recList = recList.stream().filter(reception -> reception.getId_registration().getID_Registration().toString() == idReg).toList();
+            if (recList.size() > 0){
+
+            }
+            else {
+                Registration registration = new Registration();
+                registration.setID_Registration(Long.parseLong(idReg));
+                Diagnosis diagnosis = new Diagnosis();
+                diagnosis.setID_Diagnosis(null);
+                Reception reception = new Reception(0l, LocalDateTime.now().toLocalDate().toString(), LocalDateTime.now().toLocalTime().toString(), "-", registration, diagnosis);
+                apiInterface.addReception(reception).execute();
+            }
+            return "ReceptionPatWin";
+        }
+         catch (Exception e ){Logger.getAnonymousLogger().info(e.getMessage());}
+        return "";
+    }
 
     @GetMapping("/PatientRecInfo")
     private String getPatientRecInfo() {return "PatientRecInfo";}
@@ -253,7 +284,7 @@ public class HomeController {
             Response<List<DepartmentMed>> res = listDepartment.execute();
             model.addAttribute("departmentList", res.body());
         }
-        catch (Exception e) {}
+            catch (Exception e) {}
         return "modelsWin/DepartmentWin";
     }
 
@@ -379,7 +410,7 @@ public class HomeController {
     }
 
     @GetMapping("/AdminPanel/modelsWin/PositionWin")
-    public String getPosition(Model model) {
+    protected String getPosition(Model model) {
         try {
             APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
             Call<List<Position>> listPosition = api.getListPosition();
@@ -606,8 +637,7 @@ public class HomeController {
             APIInterface api = RequestBuilder.buildRequest().create(APIInterface.class);
             Call<List<Loggers>> listLog = api.getLoggers();
             Response<List<Loggers>> res = listLog.execute();
-            Logger.getAnonymousLogger().info(res.body().get(0).getDate_Log());
-
+            Logger.getAnonymousLogger().info(res.body().size() + "");
             model.addAttribute("logs", res.body());
         } catch (Exception e) {
             Logger.getAnonymousLogger().info(e.getMessage());
@@ -640,4 +670,54 @@ public class HomeController {
         catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
         return "redirect:/RegistrationsList";
     }
+
+    @PostMapping("/uploadFiles")
+    public String uploadFiles(@RequestParam("fileinput") MultipartFile file,
+                              @RequestParam("loginUser") String login){
+        try {
+            Path basePath = Path.of("C:\\Users\\wshma\\OneDrive\\Рабочий стол\\МПТ4\\УП\\studySpring\\MedInstitution\\files\\");
+            Path savePath = basePath.resolve(login + ".pdf");
+            Files.copy(file.getInputStream(), savePath);
+        }
+        catch (Exception e) {Logger.getAnonymousLogger().info(e.getMessage());}
+        return "redirect:/PrivateRoom";
+    }
+
+    private final String uploadDirectory = "C:\\Users\\wshma\\OneDrive\\Рабочий стол\\МПТ4\\УП\\studySpring\\MedInstitution\\files";
+
+    @GetMapping("/download/{fileName:.+}")
+    public void downloadFile(@PathVariable String fileName, HttpServletResponse response) throws IOException {
+        Path filePath = Paths.get(uploadDirectory).resolve(fileName + ".pdf").normalize();
+
+        if (Files.exists(filePath)) {
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".pdf");
+
+            try {
+                Files.copy(filePath, response.getOutputStream());
+                response.getOutputStream().flush();
+            } catch (IOException e) {
+                e.printStackTrace(); // Обработайте ошибку копирования файла
+            }
+        } else {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().println("File not found");
+        }
+    }
+
+//    @GetMapping("/downloadFiles")
+//    public ResponseEntity<ByteArrayResource> downloadFiles(@RequestParam("fileName") String fileName){
+//        try {
+//            String filePath = "src\\main\\resources\\static\\" + fileName + ".pdf";
+//            Resource resourceFile = new ClassPathResource(filePath);
+//            byte[] fileContent = Files.readAllBytes(resourceFile.getFile().toPath());
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+//            headers.setContentDispositionFormData("attachment", fileName);
+//            ByteArrayResource resource = new ByteArrayResource(fileContent);
+//            return ResponseEntity.ok().headers(headers).contentLength(fileContent.length).body(resource);
+//        }
+//        catch (Exception e){Logger.getAnonymousLogger().info(e.getMessage());}
+//        return ResponseEntity.badRequest().body(null);
+//    }
 }

@@ -274,16 +274,20 @@ public interface APIInterface {
 
     @GET("/getAllRegistrationsView")
     public Call<List<read_all_registrations>> readAllRegistrations();
+
+    @GET("/getRegistration")
+    public Call<List<Registration>> getListRegistrarions();
+
+    @GET("/getFreeRegistration")
+    public Call<List<Registration>> getRegistrarions();
     //------------------------------------
 
     @GET("/getLogIn")
     public Call<Map<String, Object>> returnLogIn(@Query("login") String login, @Query("password") String password);
 
 
-    @GET("/getFreeRegistration")
-    public Call<List<Registration>> getRegistrarions();
-    @GET("/getRegistration")
-    public Call<List<Registration>> getListRegistrarions();
+
+
 
 
 }

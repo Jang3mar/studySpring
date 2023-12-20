@@ -25,6 +25,8 @@ public class Employee {
     @SerializedName("password_Employee")
     private String Password_Employee;
 
+    public Employee(){}
+
     public Employee(Long ID_Employee, String second_Employee, String first_Employee, String middle_Employee, String birthday_Employee, String login_Employee, String password_Employee) {
         this.ID_Employee = ID_Employee;
         Second_Employee = second_Employee;

@@ -240,7 +240,7 @@ public class HomeController {
     @ResponseBody
     public Employee returnEmployee(@PathVariable("id") Long id){
         List<Employee> employeeList = returnEmployee();
-        Logger.getAnonymousLogger().info("Here: " + employeeList.size());
+        //Logger.getAnonymousLogger().info("Here: " + employeeList.size());
         return employeeList.stream().filter(employee -> employee.getID_Employee() == id).findAny().orElse(null);
     }
 
@@ -311,7 +311,7 @@ public class HomeController {
         return null;
     }
 
-    @PostMapping(value = "/Ы")
+    @PostMapping(value = "/registerPatient")
     public Patient registerPatient(@RequestBody Patient patient){
         try{
             //patient.setLogin_Patient(hashString(patient.getLogin_Patient()));
@@ -429,9 +429,13 @@ public class HomeController {
     public Document addDocument(@RequestBody Document document){
         Logger.getAnonymousLogger().info(document.getDate_Issue());
         Document doc = getDocument(document.getID_Patient().getID_Patient());
-        if(doc.getID_Document() == null)
-            allDAO.addToTable("Document", new Document_Info(document));
-        else allDAO.updateToTable("Document",new Document_Info(document), doc.getID_Document());
+        List<Document> list = returnDocument();
+        list = list.stream().filter(item -> (item.getSeries_Passport() + item.getNum_Passport()).equals(document.getSeries_Passport() + document.getNum_Passport())).toList();
+        if (list.size() <= 0){
+            if(doc.getID_Document() == null)
+                allDAO.addToTable("Document", new Document_Info(document));
+            else allDAO.updateToTable("Document",new Document_Info(document), doc.getID_Document());
+        }
         return new Document();
     }
 
@@ -1017,8 +1021,13 @@ public class HomeController {
                 Patient patient = returnPatient(res.getLong(6));
                 Employee employee = returnEmployee(res.getLong(5));
 //                Logger.getAnonymousLogger().info(id + "");
-                Logger.getAnonymousLogger().info(employee.getID_Employee() + " AAAAAAAAAAA");
-                registration = new Registration(res.getLong(1), res.getString(2), res.getString(3), res.getString(4), employee, patient);
+//                Logger.getAnonymousLogger().info(employee.getID_Employee() + " AAAAAAAAAAA");
+                registration = new Registration(res.getLong(1),
+                        res.getString(2),
+                        res.getString(3),
+                        res.getString(4),
+                        employee,
+                        patient);
                 registrationList.add(registration);
             }
         }
@@ -1151,8 +1160,24 @@ public class HomeController {
             }
             String enteranceString = "";
             if (map.containsKey("type")) {
-                enteranceString = map.get("type").equals("P") ? "Вход пациента с id - " : "Вход сотрудника с id - ";
-                enteranceString += map.get("id");
+                switch (map.get("type").toString()){
+                    case "P":
+                        enteranceString = "Вход пациента с id - ";
+                        enteranceString += map.get("id");
+                        break;
+                    case "E":
+                        enteranceString = "Вход сотрудника с id - ";
+                        enteranceString += map.get("id");
+                        break;
+                    case "S":
+                        enteranceString = "Вход системного администратора с id - ";
+                        enteranceString += map.get("id");
+                        break;
+                    case "A":
+                        enteranceString = "Вход администратора с id - ";
+                        enteranceString += map.get("id");
+                        break;
+                }
                 allDAO.noLogAdd("Loggers", new Loggers(0l,
                         enteranceString,
                         LocalDateTime.now().toLocalDate().toString())
@@ -1186,6 +1211,7 @@ public class HomeController {
                         res.getString(2),
                         res.getString(3));
                 loggersList.add(log);
+                Logger.getAnonymousLogger().info(res.getLong(1) + res.getString(2) + res.getString(3));
             }
         }
         catch (Exception e) {

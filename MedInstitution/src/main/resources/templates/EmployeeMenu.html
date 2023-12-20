@@ -33,6 +33,8 @@
      <table class="employee-reg-table">
          <tr th:each="item : ${registrations}">
              <form method="get" action="/ReceptionPatWin">
+                 <input hidden name="idReg" th:value="${item.id_registration}">
+                 <td></td>
                  <td><a th:text="${item.date}">Дата</a></td>
                  <td><a th:text="${item.time}">Время</a></td>
                  <td><a th:text="${item.patientFIO}">Пациент</a></td>
@@ -41,28 +43,28 @@
          </tr>
      </table>
 </div>
-<div class="popup-reg">
-    <form>
-        <div class="popup">
-            <h3>Добавьте новую запись</h3>
-            <a>Дата</a>
-            <input type="text">
-            <p></p>
-            <a>Время</a>
-            <input type="text">
-            <p></p>
-            <button class="new-reg-button close-popup">Сохранить и закрыть</button>
-        </div>
-    </form>
-</div>
+<!--<div class="popup-reg">-->
+<!--    <form>-->
+<!--        <div class="popup">-->
+<!--            <h3>Добавьте новую запись</h3>-->
+<!--            <a>Дата</a>-->
+<!--            <input type="text">-->
+<!--            <p></p>-->
+<!--            <a>Время</a>-->
+<!--            <input type="text">-->
+<!--            <p></p>-->
+<!--            <button class="new-reg-button close-popup">Сохранить и закрыть</button>-->
+<!--        </div>-->
+<!--    </form>-->
+<!--</div>-->
 
-<script>
-    $('.open-Popup').click(function (){
-        $('.popup-reg').fadeIn(600);
-    });
-    $('.close-popup').click(function (){
-        $('.popup-reg').fadeOut(600);
-    });
-</script>
+<!--<script>-->
+<!--    $('.open-Popup').click(function (){-->
+<!--        $('.popup-reg').fadeIn(600);-->
+<!--    });-->
+<!--    $('.close-popup').click(function (){-->
+<!--        $('.popup-reg').fadeOut(600);-->
+<!--    });-->
+<!--</script>-->
 </body>
 </html>

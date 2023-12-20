@@ -23,12 +23,14 @@
 </div>
 <div>
     <table>
+        <tbody>
         <tr th:each="item : ${logs}">
             <form method="get" action="/SysAdminMenu">
-                <td><a th:text="${item.date_Log}">время</a></td>
+                <td><a th:text="${item.date_name}">время</a></td>
                 <td><a th:text="${item.log_Name}">описание</a></td>
             </form>
         </tr>
+        </tbody>
     </table>
 </div>
 </body>

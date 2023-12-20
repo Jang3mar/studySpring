@@ -24,8 +24,10 @@
 <div class="patient-label">
     <label>Данные пациента</label>
 </div>
-<form>
+<form method="post" action="/uploadFiles" enctype="multipart/form-data">
     <div class="button-styles">
+        <input type="file" name="fileinput" onchange="checkFileSize(this)">
+        <input id="userId" name="loginUser" hidden th:value="${patient.getLogin_Patient()}">
         <button style="margin: 20px">Загрузить результаты обследований</button>
     </div>
 </form>
@@ -97,14 +99,28 @@
             <form>
                 <td><input></td>
             </form>
-            <form>
-                <td><button>Скачать</button></td>
-            </form>
+            <td><a th:href="${'/download/'+patient.getLogin_Patient()}"><button>Скачать</button></a></td>
             <form>
                 <td><button>Удалить</button></td>
             </form>
         </tr>
     </table>
 </div>
+
+<script>
+    function checkFileSize(inputElement) {
+        var input = inputElement;
+        var fileSize = input.files[0].size;
+
+        if (fileSize > 100000) {
+            alert('Файл слишком большой! Максимальный размер - 100 тысяч байт.');
+            input.value = '';
+        }
+        if(!input.files[0].name.endsWith(".pdf")){
+            alert("Файл должен храниться в pdf формате!")
+            input.value = "";
+        }
+    }
+</script>
 </body>
 </html>
